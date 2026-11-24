@@ -229,6 +229,8 @@
             --sys-gray-soft: rgba(142, 142, 147, 0.14);
             --sys-green: #34C759;
             --sys-green-soft: rgba(52, 199, 89, 0.14);
+            --sys-purple: #AF52DE;
+            --sys-purple-soft: rgba(175, 82, 222, 0.12);
 
             --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
             --shadow-card-hover: 0 14px 36px rgba(0, 0, 0, 0.065), 0 2px 6px rgba(0, 0, 0, 0.035);
@@ -283,6 +285,8 @@
             --sys-gray-soft: rgba(142, 142, 147, 0.22);
             --sys-green: #30D158;
             --sys-green-soft: rgba(48, 209, 88, 0.2);
+            --sys-purple: #BF5AF2;
+            --sys-purple-soft: rgba(191, 90, 242, 0.2);
 
             --shadow-card: 0 12px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
             --shadow-card-hover: 0 16px 44px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -455,16 +459,20 @@
             box-shadow: 0 0 0 3.5px var(--sys-blue-soft);
         }
 
-        /* Quadranten-Karten (Transluzentes Glas) */
-        .quadrant-card {
+        /* Quadranten-Karten & Listen-Container (Transluzentes Glas) */
+        .quadrant-card,
+        .apple-glass-panel {
             background: var(--card-glass);
             backdrop-filter: blur(var(--card-blur)) saturate(175%);
             -webkit-backdrop-filter: blur(var(--card-blur)) saturate(175%);
             border: 1px solid var(--border-hairline);
-            border-top-width: 3px;
             border-radius: 22px;
             box-shadow: var(--shadow-card);
             transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .quadrant-card {
+            border-top-width: 3px;
         }
 
         .quadrant-card:hover {
@@ -534,6 +542,7 @@
         }
 
         /* Quadranten-Farbklassen */
+        .q-badge-inbox { background: var(--sys-purple-soft); color: var(--sys-purple); }
         .q-badge-do { background: var(--sys-red-soft); color: var(--sys-red); }
         .q-badge-schedule { background: var(--sys-blue-soft); color: var(--sys-blue); }
         .q-badge-delegate { background: var(--sys-orange-soft); color: var(--sys-orange); }
@@ -546,6 +555,28 @@
 
         .q-btn-do:hover, .q-btn-schedule:hover, .q-btn-delegate:hover, .q-btn-eliminate:hover {
             filter: brightness(1.06);
+        }
+
+        /* Schnell-Zuordnungs-Pills in der Gesamtliste */
+        .assign-pill {
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            transition: transform 0.14s ease, filter 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .assign-pill:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        .assign-pill:active {
+            transform: scale(0.96);
+        }
+
+        .assign-pill.is-current {
+            box-shadow: 0 0 0 1.5px currentColor;
         }
 
         /* Sync-Status-Farben */
@@ -680,8 +711,36 @@
                 </div>
             </div>
 
-            <!-- Filter- & Suchleiste -->
-            <div class="apple-divider mt-4 pt-3 border-t flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <!-- Ansichts-Umschalter, Suche & Status-Filter -->
+            <div class="apple-divider mt-4 pt-3 border-t flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <!-- 2-Wege Ansichts-Switcher: Matrix vs. Gesamtliste -->
+                <div class="apple-segmented self-start" role="tablist" aria-label="Ansicht wechseln">
+                    <button type="button" data-view="matrix" role="tab"
+                        class="view-btn apple-seg-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                        </svg>
+                        <span>Matrix</span>
+                    </button>
+                    <button type="button" data-view="list" role="tab"
+                        class="view-btn apple-seg-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <circle cx="3.5" cy="6" r="1" fill="currentColor"></circle>
+                            <circle cx="3.5" cy="12" r="1" fill="currentColor"></circle>
+                            <circle cx="3.5" cy="18" r="1" fill="currentColor"></circle>
+                        </svg>
+                        <span>Gesamtliste</span>
+                        <span id="inbox-count-badge" class="hidden ml-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white tabular-nums"
+                            style="background: var(--sys-purple);">0</span>
+                    </button>
+                </div>
+
                 <!-- Suchfeld -->
                 <div class="relative flex-1 max-w-md">
                     <svg class="w-4 h-4 text-apple-tertiary absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -700,7 +759,7 @@
                 </div>
 
                 <!-- Status-Filter (Segmented Control) -->
-                <div class="apple-segmented self-start sm:self-auto" role="group" aria-label="Aufgaben filtern">
+                <div class="apple-segmented self-start md:self-auto" role="group" aria-label="Aufgaben filtern">
                     <button type="button" data-filter="all" class="filter-btn apple-seg-btn px-3.5 py-1.5 text-xs sm:text-sm">
                         Alle
                     </button>
@@ -715,28 +774,133 @@
         </div>
     </header>
 
-    <!-- Hauptbereich: 2x2 Eisenhower-Matrix -->
+    <!-- Hauptbereich -->
     <main class="apple-main flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <!-- Spaltenbeschriftung (Desktop) -->
-        <div class="hidden lg:grid lg:grid-cols-2 gap-6 mb-3 px-2">
-            <div class="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wider text-apple-secondary">
-                <span class="w-2 h-2 rounded-full" style="background: var(--sys-red);"></span>
-                <span>Dringend</span>
+
+        <!-- ANSICHT 1: 2x2 Eisenhower-Matrix -->
+        <div id="matrix-view-container">
+            <!-- Hinweis-Banner, falls unsortierte Aufgaben im Posteingang warten -->
+            <div id="matrix-inbox-banner" class="hidden mb-5 apple-glass-panel px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                style="border-left: 3px solid var(--sys-purple);">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl q-badge-inbox flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                            <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                        </svg>
+                    </div>
+                    <p id="matrix-inbox-banner-text" class="text-xs sm:text-sm text-apple-primary font-medium">
+                        Du hast unsortierte Aufgaben in der Gesamtliste.
+                    </p>
+                </div>
+                <button id="btn-jump-to-inbox" type="button"
+                    class="apple-pill-btn px-3.5 py-1.5 text-xs font-semibold shrink-0 self-start sm:self-auto"
+                    style="color: var(--sys-purple);">
+                    Jetzt einordnen →
+                </button>
             </div>
-            <div class="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wider text-apple-secondary">
-                <span class="w-2 h-2 rounded-full" style="background: var(--sys-blue);"></span>
-                <span>Nicht dringend</span>
+
+            <!-- Spaltenbeschriftung (Desktop) -->
+            <div class="hidden lg:grid lg:grid-cols-2 gap-6 mb-3 px-2">
+                <div class="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wider text-apple-secondary">
+                    <span class="w-2 h-2 rounded-full" style="background: var(--sys-red);"></span>
+                    <span>Dringend</span>
+                </div>
+                <div class="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wider text-apple-secondary">
+                    <span class="w-2 h-2 rounded-full" style="background: var(--sys-blue);"></span>
+                    <span>Nicht dringend</span>
+                </div>
             </div>
+
+            <!-- 2x2 Quadranten-Grid -->
+            <div id="matrix-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
+                <!-- Quadranten werden dynamisch gerendert -->
+            </div>
+
+            <p class="mt-6 text-center text-xs text-apple-tertiary">
+                Tipp: Aufgaben lassen sich per Drag-and-Drop zwischen den Quadranten verschieben oder über die Gesamtliste zuerst schnell sammeln und später per Klick einordnen.
+            </p>
         </div>
 
-        <!-- 2x2 Quadranten-Grid -->
-        <div id="matrix-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
-            <!-- Quadranten werden dynamisch gerendert -->
-        </div>
+        <!-- ANSICHT 2: Gesamtaufgabenliste & Schnellsammler (Posteingang) -->
+        <div id="list-view-container" class="hidden max-w-4xl mx-auto space-y-6">
+            <!-- Schnellerfassung direkt in den Posteingang -->
+            <section class="apple-glass-panel p-4 sm:p-5" style="border-top: 3px solid var(--sys-purple);">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-2xl q-badge-inbox flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
+                                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                                <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold text-apple-primary leading-snug">
+                                Schnell sammeln
+                            </h2>
+                            <p class="text-xs text-apple-secondary">
+                                Kopf frei bekommen – erst notieren, später mit 1 Klick in Q1–Q4 einordnen
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-        <p class="mt-6 text-center text-xs text-apple-tertiary">
-            Tipp: Aufgaben lassen sich per Drag-and-Drop zwischen den Quadranten verschieben oder per Klick bearbeiten. Alle Änderungen werden live in der Cloud synchronisiert.
-        </p>
+                <form id="inbox-quick-add-form">
+                    <div class="flex items-center gap-2">
+                        <input id="inbox-title-input" type="text" name="title" placeholder="Neue Aufgabe schnell notieren..." maxlength="140" autocomplete="off"
+                            class="apple-input flex-1 px-4 py-2.5 text-sm">
+                        <button id="inbox-toggle-extra" type="button" class="apple-pill-btn p-2.5 text-apple-secondary"
+                            title="Notiz &amp; Datum hinzufügen" aria-label="Optionale Felder ein- oder ausblenden" aria-expanded="false">
+                            <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </button>
+                        <button type="submit" class="apple-primary-btn px-4 sm:px-5 py-2.5 text-xs sm:text-sm shrink-0">
+                            Sammeln
+                        </button>
+                    </div>
+                    <div id="inbox-extra-fields" class="hidden grid-cols-1 sm:grid-cols-3 gap-2 mt-2.5">
+                        <input type="text" name="note" placeholder="Kurze Notiz (optional)" maxlength="500"
+                            class="apple-input sm:col-span-2 px-3.5 py-2 text-xs">
+                        <input type="date" name="dueDate" aria-label="Fälligkeitsdatum"
+                            class="apple-input px-3.5 py-2 text-xs">
+                    </div>
+                </form>
+            </section>
+
+            <!-- Bereichs-Filter innerhalb der Gesamtliste -->
+            <div class="flex flex-wrap items-center justify-between gap-2 px-1">
+                <div class="apple-segmented flex-wrap" role="group" aria-label="Gesamtliste nach Bereich filtern">
+                    <button type="button" data-list-scope="all" class="list-scope-btn apple-seg-btn px-3 py-1.5 text-xs">
+                        Alle
+                    </button>
+                    <button type="button" data-list-scope="inbox" class="list-scope-btn apple-seg-btn px-3 py-1.5 text-xs">
+                        Unsortiert
+                    </button>
+                    <button type="button" data-list-scope="do" class="list-scope-btn apple-seg-btn px-3 py-1.5 text-xs">
+                        Q1
+                    </button>
+                    <button type="button" data-list-scope="schedule" class="list-scope-btn apple-seg-btn px-3 py-1.5 text-xs">
+                        Q2
+                    </button>
+                    <button type="button" data-list-scope="delegate" class="list-scope-btn apple-seg-btn px-3 py-1.5 text-xs">
+                        Q3
+                    </button>
+                    <button type="button" data-list-scope="eliminate" class="list-scope-btn apple-seg-btn px-3 py-1.5 text-xs">
+                        Q4
+                    </button>
+                </div>
+                <span id="list-summary-count" class="text-xs font-medium text-apple-secondary tabular-nums">
+                    0 Aufgaben
+                </span>
+            </div>
+
+            <!-- Dynamischer Inhalt der Gesamtliste -->
+            <div id="master-list-sections" class="space-y-6">
+                <!-- Wird dynamisch gerendert -->
+            </div>
+        </div>
     </main>
 
     <!-- Modal: Aufgabe bearbeiten -->
@@ -783,9 +947,10 @@
 
                     <div>
                         <label for="edit-task-quadrant" class="block text-xs font-semibold uppercase tracking-wide text-apple-secondary mb-1.5">
-                            Quadrant verschieben
+                            Einordnung / Quadrant
                         </label>
                         <select id="edit-task-quadrant" class="apple-input w-full px-3.5 py-2.5 text-sm">
+                            <option value="inbox">Posteingang (Unsortiert)</option>
                             <option value="do">Q1: Sofort erledigen</option>
                             <option value="schedule">Q2: Terminieren &amp; Planen</option>
                             <option value="delegate">Q3: Delegieren</option>
@@ -890,7 +1055,7 @@
                         </label>
                     </div>
 
-                    <textarea id="import-textarea" rows="8" placeholder='{"tasks": [{"title": "Beispielaufgabe", "quadrant": "do"}]}'
+                    <textarea id="import-textarea" rows="8" placeholder='{"tasks": [{"title": "Beispielaufgabe", "quadrant": "inbox"}]}'
                         class="apple-input w-full p-3.5 text-xs font-mono resize-none"></textarea>
 
                     <div class="flex items-center justify-end gap-2 pt-1">
@@ -1049,8 +1214,8 @@
     <script type="module">
         /**
          * ============================================================================
-         * EISENHOWER-MATRIX – REINES APPLE-CI DESIGN (APPLE HELL & APPLE DUNKEL)
-         * Firebase v11 Auth & Firestore Echtzeit-Sync unter:
+         * EISENHOWER-MATRIX – APPLE-CI DESIGN + GESAMTAUFGABENLISTE (POSTEINGANG)
+         * Firebase v11 Auth (browserLocalPersistence) & Firestore Echtzeit-Sync unter:
          * artifacts/{appId}/users/{userId}/eisenhower/state
          * ============================================================================
          */
@@ -1080,7 +1245,7 @@
             onSnapshot
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Firebase-Konfiguration (direkt einsatzbereit für Vorschau & Netlify) ---
+        // --- Firebase-Konfiguration ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'eisenhower-matrix-app';
         const firebaseConfig = typeof __firebase_config !== 'undefined'
             ? JSON.parse(__firebase_config)
@@ -1156,7 +1321,22 @@
             }
         ];
 
-        const VALID_QUADRANT_IDS = new Set(QUADRANTS.map(q => q.id));
+        const INBOX_META = {
+            id: 'inbox',
+            code: 'Posteingang',
+            title: 'Unsortiert',
+            subtitle: 'Noch nicht eingeordnet',
+            badgeClass: 'q-badge-inbox',
+            colorVar: 'var(--sys-purple)'
+        };
+
+        const VALID_QUADRANT_IDS = new Set(['inbox', ...QUADRANTS.map(q => q.id)]);
+        const QUADRANT_ORDER = { inbox: 0, do: 1, schedule: 2, delegate: 3, eliminate: 4 };
+
+        function getQuadrantMeta(id) {
+            if (id === 'inbox') return INBOX_META;
+            return QUADRANTS.find(q => q.id === id) || INBOX_META;
+        }
 
         const MOTIVATIONAL_TOASTS = [
             'Stark gemacht! Ein Punkt weniger auf der Liste.',
@@ -1170,6 +1350,8 @@
         let state = {
             tasks: [],
             theme: 'apple-light', // 'apple-light' | 'apple-dark'
+            view: 'matrix',       // 'matrix' | 'list'
+            listScope: 'all',     // 'all' | 'inbox' | 'do' | 'schedule' | 'delegate' | 'eliminate'
             filter: 'all',        // 'all' | 'open' | 'completed'
             search: '',
             exportTab: 'markdown',
@@ -1229,7 +1411,7 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // --- Theme-System (Ausschließlich Apple Hell & Apple Dunkel + Abwärtskompatibilität) ---
+        // --- Theme-System (Ausschließlich Apple Hell & Apple Dunkel) ---
 
         function normalizeTheme(raw) {
             if (raw === 'apple-dark' || raw === 'dark') return 'apple-dark';
@@ -1243,7 +1425,6 @@
 
             document.documentElement.setAttribute('data-theme', theme);
 
-            // Browser & iOS Statusleisten-Farbe dynamisch anpassen
             const metaThemeColor = document.getElementById('meta-theme-color');
             if (metaThemeColor) {
                 metaThemeColor.setAttribute('content', theme === 'apple-dark' ? '#000000' : '#F5F5F7');
@@ -1252,7 +1433,7 @@
             try {
                 window.localStorage.setItem(THEME_STORAGE_KEY, theme);
             } catch (e) {
-                // Ignorieren, falls localStorage blockiert ist
+                // Ignorieren
             }
 
             updateThemeSwitcherUI();
@@ -1287,6 +1468,70 @@
             btn.addEventListener('click', () => {
                 applyTheme(btn.dataset.themeChoice, true);
             });
+        });
+
+        // --- Ansichts-Wechsel (Matrix vs. Gesamtliste) ---
+
+        function setView(nextView) {
+            state.view = nextView === 'list' ? 'list' : 'matrix';
+            renderAll();
+            if (state.view === 'list') {
+                const inboxInput = document.getElementById('inbox-title-input');
+                if (inboxInput) inboxInput.focus();
+            }
+        }
+
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', () => setView(btn.dataset.view));
+        });
+
+        document.getElementById('btn-jump-to-inbox').addEventListener('click', () => {
+            state.listScope = 'inbox';
+            setView('list');
+        });
+
+        document.querySelectorAll('.list-scope-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                state.listScope = btn.dataset.listScope;
+                renderMasterList();
+            });
+        });
+
+        // Schnellerfassung im Posteingang
+        const inboxForm = document.getElementById('inbox-quick-add-form');
+        const inboxToggleExtra = document.getElementById('inbox-toggle-extra');
+        const inboxExtraFields = document.getElementById('inbox-extra-fields');
+
+        inboxToggleExtra.addEventListener('click', () => {
+            const nowHidden = inboxExtraFields.classList.toggle('hidden');
+            inboxExtraFields.classList.toggle('grid', !nowHidden);
+            const svg = inboxToggleExtra.querySelector('svg');
+            svg.classList.toggle('rotate-45', !nowHidden);
+            svg.style.color = !nowHidden ? 'var(--sys-blue)' : '';
+            inboxToggleExtra.setAttribute('aria-expanded', String(!nowHidden));
+        });
+
+        inboxForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const titleInput = inboxForm.elements['title'];
+            const noteInput = inboxForm.elements['note'];
+            const dateInput = inboxForm.elements['dueDate'];
+            if (!titleInput.value.trim()) {
+                titleInput.focus();
+                return;
+            }
+            const tVal = titleInput.value;
+            const nVal = noteInput.value;
+            const dVal = dateInput.value;
+            titleInput.value = '';
+            noteInput.value = '';
+            dateInput.value = '';
+            if (state.listScope !== 'all' && state.listScope !== 'inbox') {
+                state.listScope = 'inbox';
+            }
+            await addTask('inbox', tVal, nVal, dVal);
+            showToast('Aufgabe im Posteingang gesammelt.');
+            titleInput.focus();
         });
 
         // --- Lokaler Offline-Fallback ---
@@ -1347,7 +1592,7 @@
             showToast('Offline – Änderungen werden synchronisiert, sobald du wieder online bist.');
         });
 
-        // --- Firestore Datenpfad: artifacts/{appId}/users/{userId}/eisenhower/state ---
+        // --- Firestore Datenpfad ---
 
         function getUserStateDoc(uid) {
             return doc(db, 'artifacts', appId, 'users', uid, 'eisenhower', 'state');
@@ -1363,7 +1608,7 @@
                 .filter(t => t && typeof t.title === 'string' && t.title.trim().length > 0)
                 .map(t => ({
                     id: t.id || generateId(),
-                    quadrant: VALID_QUADRANT_IDS.has(t.quadrant) ? t.quadrant : 'do',
+                    quadrant: VALID_QUADRANT_IDS.has(t.quadrant) ? t.quadrant : 'inbox',
                     title: t.title.trim().slice(0, 140),
                     note: typeof t.note === 'string' ? t.note.trim().slice(0, 500) : '',
                     dueDate: typeof t.dueDate === 'string' ? t.dueDate : '',
@@ -1385,30 +1630,12 @@
                 },
                 {
                     id: generateId(),
-                    quadrant: 'do',
-                    title: 'Wichtige Kundenrückfrage beantworten',
-                    note: 'Angebot per E-Mail bestätigen.',
-                    dueDate: getDateOffset(0),
-                    completed: false,
-                    createdAt: Date.now() - 35000
-                },
-                {
-                    id: generateId(),
                     quadrant: 'schedule',
                     title: 'Quartalsziele & Meilensteine planen',
                     note: '60 Minuten Fokuszeit im Kalender blocken.',
                     dueDate: getDateOffset(4),
                     completed: false,
                     createdAt: Date.now() - 30000
-                },
-                {
-                    id: generateId(),
-                    quadrant: 'schedule',
-                    title: 'Sport-Routine für diese Woche festlegen',
-                    note: 'Dienstag und Donnerstag jeweils 45 Min.',
-                    dueDate: getDateOffset(2),
-                    completed: true,
-                    createdAt: Date.now() - 25000
                 },
                 {
                     id: generateId(),
@@ -1460,7 +1687,6 @@
                 stateRef,
                 async (docSnap) => {
                     if (!docSnap.exists()) {
-                        // Prüfen, ob aus einer früheren Version noch Daten unter data/matrix liegen
                         let migrated = false;
                         try {
                             const legacySnap = await getDoc(getLegacyMatrixDoc(user.uid));
@@ -1475,7 +1701,7 @@
                                 }
                             }
                         } catch (e) {
-                            // Ignorieren, falls kein altes Dokument vorhanden
+                            // Ignorieren
                         }
 
                         if (!migrated) {
@@ -1520,7 +1746,7 @@
             }
         }
 
-        // --- Konfetti-Animation (Apple Systemfarben) ---
+        // --- Konfetti-Animation ---
 
         const confettiEngine = (() => {
             const canvas = document.getElementById('confetti-canvas');
@@ -1624,7 +1850,7 @@
 
             state.tasks.unshift({
                 id: generateId(),
-                quadrant: quadrantId,
+                quadrant: VALID_QUADRANT_IDS.has(quadrantId) ? quadrantId : 'inbox',
                 title: cleanTitle,
                 note: note.trim(),
                 dueDate: dueDate || '',
@@ -1674,8 +1900,12 @@
             if (!task || task.quadrant === targetQuadrantId) return;
 
             await updateTask(taskId, { quadrant: targetQuadrantId });
-            const targetQ = QUADRANTS.find(q => q.id === targetQuadrantId);
-            if (targetQ) showToast(`Verschoben nach „${targetQ.title}“`);
+            const meta = getQuadrantMeta(targetQuadrantId);
+            if (targetQuadrantId === 'inbox') {
+                showToast('Zurück in den Posteingang verschoben.');
+            } else {
+                showToast(`In ${meta.code}: ${meta.title} eingeordnet!`, 'success');
+            }
         }
 
         async function clearCompletedTasks() {
@@ -1690,21 +1920,21 @@
 
         // --- Filterung & Sortierung ---
 
-        function getFilteredTasksForQuadrant(quadrantId) {
+        function matchesSearchAndStatus(task) {
+            if (state.filter === 'open' && task.completed) return false;
+            if (state.filter === 'completed' && !task.completed) return false;
             const query = state.search.trim().toLowerCase();
+            if (query) {
+                const inTitle = task.title.toLowerCase().includes(query);
+                const inNote = (task.note || '').toLowerCase().includes(query);
+                if (!inTitle && !inNote) return false;
+            }
+            return true;
+        }
 
+        function getFilteredTasksForQuadrant(quadrantId) {
             return state.tasks
-                .filter(task => {
-                    if (task.quadrant !== quadrantId) return false;
-                    if (state.filter === 'open' && task.completed) return false;
-                    if (state.filter === 'completed' && !task.completed) return false;
-                    if (query) {
-                        const inTitle = task.title.toLowerCase().includes(query);
-                        const inNote = (task.note || '').toLowerCase().includes(query);
-                        if (!inTitle && !inNote) return false;
-                    }
-                    return true;
-                })
+                .filter(task => task.quadrant === quadrantId && matchesSearchAndStatus(task))
                 .sort((a, b) => {
                     if (a.completed !== b.completed) return a.completed ? 1 : -1;
                     return (b.createdAt || 0) - (a.createdAt || 0);
@@ -1717,6 +1947,7 @@
             const total = state.tasks.length;
             const completed = state.tasks.filter(t => t.completed).length;
             const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+            const openInboxCount = state.tasks.filter(t => t.quadrant === 'inbox' && !t.completed).length;
 
             document.getElementById('progress-stats').textContent = `${completed} / ${total} erledigt (${percent} %)`;
             document.getElementById('progress-bar').style.width = `${percent}%`;
@@ -1738,9 +1969,37 @@
 
             document.getElementById('btn-clear-completed').disabled = completed === 0;
 
+            // Inbox-Zähler am Gesamtliste-Tab
+            const inboxBadge = document.getElementById('inbox-count-badge');
+            if (openInboxCount > 0) {
+                inboxBadge.textContent = openInboxCount;
+                inboxBadge.classList.remove('hidden');
+            } else {
+                inboxBadge.classList.add('hidden');
+            }
+
+            // Hinweis-Banner in der Matrix-Ansicht
+            const banner = document.getElementById('matrix-inbox-banner');
+            const bannerText = document.getElementById('matrix-inbox-banner-text');
+            if (openInboxCount > 0) {
+                bannerText.textContent = openInboxCount === 1
+                    ? '1 gesammelte Aufgabe wartet in der Gesamtliste auf ihre Einordnung.'
+                    : `${openInboxCount} gesammelte Aufgaben warten in der Gesamtliste auf ihre Einordnung.`;
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+
+            // Aktiver View-Tab & Filter-Buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.toggle('is-active', btn.dataset.view === state.view);
+            });
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.toggle('is-active', btn.dataset.filter === state.filter);
             });
+
+            document.getElementById('matrix-view-container').classList.toggle('hidden', state.view !== 'matrix');
+            document.getElementById('list-view-container').classList.toggle('hidden', state.view !== 'list');
         }
 
         function renderMatrix() {
@@ -1892,6 +2151,236 @@
             });
         }
 
+        function renderMasterList() {
+            document.querySelectorAll('.list-scope-btn').forEach(btn => {
+                btn.classList.toggle('is-active', btn.dataset.listScope === state.listScope);
+            });
+
+            const container = document.getElementById('master-list-sections');
+            container.innerHTML = '';
+
+            const matchingAll = state.tasks.filter(t => {
+                if (!matchesSearchAndStatus(t)) return false;
+                if (state.listScope !== 'all' && t.quadrant !== state.listScope) return false;
+                return true;
+            });
+
+            document.getElementById('list-summary-count').textContent =
+                `${matchingAll.length} ${matchingAll.length === 1 ? 'Aufgabe' : 'Aufgaben'}`;
+
+            const inboxTasks = matchingAll
+                .filter(t => t.quadrant === 'inbox')
+                .sort((a, b) => (a.completed !== b.completed ? (a.completed ? 1 : -1) : (b.createdAt || 0) - (a.createdAt || 0)));
+
+            const sortedTasks = matchingAll
+                .filter(t => t.quadrant !== 'inbox')
+                .sort((a, b) => {
+                    if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                    const qDiff = (QUADRANT_ORDER[a.quadrant] ?? 9) - (QUADRANT_ORDER[b.quadrant] ?? 9);
+                    if (qDiff !== 0) return qDiff;
+                    return (b.createdAt || 0) - (a.createdAt || 0);
+                });
+
+            // Abschnitt 1: Posteingang (Unsortiert)
+            if (state.listScope === 'all' || state.listScope === 'inbox') {
+                const inboxSection = document.createElement('section');
+                inboxSection.className = 'apple-glass-panel p-4 sm:p-5';
+                inboxSection.innerHTML = `
+                    <div class="flex items-center justify-between gap-2 mb-3.5">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm sm:text-base font-bold text-apple-primary">Posteingang (Noch einzuordnen)</h3>
+                            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full q-badge-inbox tabular-nums">${inboxTasks.length}</span>
+                        </div>
+                        <span class="text-[11px] text-apple-tertiary hidden sm:inline">Mit 1 Klick einem Quadranten zuordnen</span>
+                    </div>
+                `;
+
+                const listEl = document.createElement('div');
+                listEl.className = 'space-y-2.5';
+
+                if (inboxTasks.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="apple-empty-box py-6 px-4 text-center">
+                            <p class="text-xs sm:text-sm">Alles eingeordnet – dein Posteingang ist leer!</p>
+                        </div>
+                    `;
+                } else {
+                    inboxTasks.forEach(task => {
+                        listEl.appendChild(createMasterListTaskElement(task));
+                    });
+                }
+
+                inboxSection.appendChild(listEl);
+                container.appendChild(inboxSection);
+            }
+
+            // Abschnitt 2: Alle bereits eingeordneten Aufgaben (Q1–Q4)
+            if (state.listScope !== 'inbox') {
+                const sortedSection = document.createElement('section');
+                sortedSection.className = 'apple-glass-panel p-4 sm:p-5';
+                const headingTitle = state.listScope === 'all'
+                    ? 'Eingeordnete Aufgaben (Q1–Q4)'
+                    : `${getQuadrantMeta(state.listScope).code}: ${getQuadrantMeta(state.listScope).title}`;
+
+                sortedSection.innerHTML = `
+                    <div class="flex items-center justify-between gap-2 mb-3.5">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm sm:text-base font-bold text-apple-primary">${headingTitle}</h3>
+                            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full text-apple-secondary tabular-nums"
+                                style="background: var(--surface-subtle);">${sortedTasks.length}</span>
+                        </div>
+                    </div>
+                `;
+
+                const listEl = document.createElement('div');
+                listEl.className = 'space-y-2.5';
+
+                if (sortedTasks.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="apple-empty-box py-6 px-4 text-center">
+                            <p class="text-xs sm:text-sm">${state.search.trim() ? 'Keine passenden Aufgaben gefunden.' : 'Keine Aufgaben in dieser Ansicht.'}</p>
+                        </div>
+                    `;
+                } else {
+                    sortedTasks.forEach(task => {
+                        listEl.appendChild(createMasterListTaskElement(task));
+                    });
+                }
+
+                sortedSection.appendChild(listEl);
+                container.appendChild(sortedSection);
+            }
+        }
+
+        function createMasterListTaskElement(task) {
+            const meta = getQuadrantMeta(task.quadrant);
+            const card = document.createElement('article');
+            card.className = `task-card group p-3.5 sm:p-4 flex flex-col gap-3 ${task.completed ? 'is-completed' : ''}`;
+
+            const topRow = document.createElement('div');
+            topRow.className = 'flex items-start gap-3';
+
+            // Checkbox
+            const checkBtn = document.createElement('button');
+            checkBtn.type = 'button';
+            checkBtn.setAttribute('aria-label', task.completed ? 'Als offen markieren' : 'Als erledigt markieren');
+            checkBtn.className = 'mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all';
+            if (task.completed) {
+                checkBtn.style.background = meta.colorVar;
+                checkBtn.style.borderColor = meta.colorVar;
+                checkBtn.style.color = '#FFFFFF';
+                checkBtn.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            } else {
+                checkBtn.style.borderColor = 'var(--border-strong)';
+                checkBtn.style.background = 'transparent';
+            }
+            checkBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleTaskCompleted(task.id, e);
+            });
+
+            // Inhalt
+            const content = document.createElement('div');
+            content.className = 'flex-1 min-w-0 cursor-pointer';
+            content.addEventListener('click', () => openEditModal(task.id));
+
+            const dueInfo = formatDueDate(task.dueDate, task.completed);
+            const dueBadgeHtml = dueInfo
+                ? `<span class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full" style="${dueInfo.style}">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        ${escapeHtml(dueInfo.label)}
+                   </span>`
+                : '';
+
+            const quadrantBadgeHtml = `<span class="inline-flex items-center text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${meta.badgeClass}">
+                ${task.quadrant === 'inbox' ? 'Unsortiert' : `${meta.code} · ${meta.title}`}
+            </span>`;
+
+            content.innerHTML = `
+                <p class="text-sm font-medium leading-snug break-words ${task.completed ? 'line-through text-apple-tertiary' : 'text-apple-primary'}">
+                    ${escapeHtml(task.title)}
+                </p>
+                ${task.note ? `
+                    <p class="text-xs text-apple-secondary mt-1 line-clamp-2 break-words">
+                        ${escapeHtml(task.note)}
+                    </p>
+                ` : ''}
+                <div class="mt-2 flex items-center gap-2 flex-wrap">
+                    ${quadrantBadgeHtml}
+                    ${dueBadgeHtml}
+                </div>
+            `;
+
+            // Bearbeiten & Löschen
+            const actions = document.createElement('div');
+            actions.className = 'flex items-center gap-1 shrink-0';
+
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.title = 'Bearbeiten';
+            editBtn.setAttribute('aria-label', 'Aufgabe bearbeiten');
+            editBtn.className = 'p-1.5 rounded-full text-apple-tertiary hover:text-apple-primary transition-colors';
+            editBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openEditModal(task.id);
+            });
+
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.title = 'Löschen';
+            delBtn.setAttribute('aria-label', 'Aufgabe löschen');
+            delBtn.className = 'p-1.5 rounded-full text-apple-tertiary transition-colors';
+            delBtn.addEventListener('mouseenter', () => { delBtn.style.color = 'var(--sys-red)'; });
+            delBtn.addEventListener('mouseleave', () => { delBtn.style.color = ''; });
+            delBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>`;
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteTask(task.id);
+            });
+
+            actions.appendChild(editBtn);
+            actions.appendChild(delBtn);
+
+            topRow.appendChild(checkBtn);
+            topRow.appendChild(content);
+            topRow.appendChild(actions);
+            card.appendChild(topRow);
+
+            // 1-Klick-Einordnungsleiste (Q1–Q4)
+            if (!task.completed) {
+                const assignBar = document.createElement('div');
+                assignBar.className = 'apple-divider pt-2.5 border-t flex items-center flex-wrap gap-1.5 pl-8';
+
+                const label = document.createElement('span');
+                label.className = 'text-[11px] text-apple-tertiary mr-1';
+                label.textContent = task.quadrant === 'inbox' ? 'Einordnen:' : 'Verschieben:';
+                assignBar.appendChild(label);
+
+                QUADRANTS.forEach(q => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    const isCurrent = task.quadrant === q.id;
+                    btn.className = `assign-pill ${q.badgeClass} ${isCurrent ? 'is-current opacity-60 cursor-default' : ''}`;
+                    btn.title = `${q.code}: ${q.title} (${q.subtitle})`;
+                    btn.textContent = `${q.code} ${q.title.split(' ')[0]}`;
+                    btn.disabled = isCurrent;
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        moveTaskToQuadrant(task.id, q.id);
+                    });
+                    assignBar.appendChild(btn);
+                });
+
+                card.appendChild(assignBar);
+            }
+
+            return card;
+        }
+
         function createTaskElement(task, quadrant) {
             const card = document.createElement('article');
             card.draggable = true;
@@ -1914,7 +2403,6 @@
                 });
             });
 
-            // Runde Apple-Erinnerungen-Checkbox
             const checkBtn = document.createElement('button');
             checkBtn.type = 'button';
             checkBtn.setAttribute('aria-label', task.completed ? 'Als offen markieren' : 'Als erledigt markieren');
@@ -1999,10 +2487,14 @@
 
         function renderAll() {
             renderHeaderStats();
-            renderMatrix();
+            if (state.view === 'matrix') {
+                renderMatrix();
+            } else {
+                renderMasterList();
+            }
         }
 
-        // --- Account-UI & Authentifizierung (iOS Safari freundlich) ---
+        // --- Account-UI & Authentifizierung ---
 
         const accountModal = document.getElementById('account-modal');
         const accountFeedback = document.getElementById('account-feedback');
@@ -2118,7 +2610,6 @@
             if (e.target === accountModal) closeAccountModal();
         });
 
-        // 1. Direkt mit bestehendem Google-Konto anmelden (1 direkter Popup-Aufruf -> iOS Safari freundlich)
         document.getElementById('btn-google-signin').addEventListener('click', async () => {
             if (!auth) return;
             clearAccountFeedback();
@@ -2133,7 +2624,6 @@
             }
         });
 
-        // 2. Gast-Konto explizit mit Google verknüpfen
         document.getElementById('btn-google-link').addEventListener('click', async () => {
             if (!auth || !currentUser) return;
             clearAccountFeedback();
@@ -2148,7 +2638,6 @@
             }
         });
 
-        // E-Mail & Passwort Submit
         document.getElementById('email-auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!auth) return;
@@ -2185,7 +2674,6 @@
             }
         });
 
-        // Abmelden
         document.getElementById('btn-sign-out').addEventListener('click', async () => {
             if (!auth) return;
             try {
@@ -2270,6 +2758,19 @@
                 `# Eisenhower-Matrix (${new Date().toLocaleDateString('de-DE')})`,
                 ''
             ];
+
+            const inboxList = state.tasks.filter(t => t.quadrant === 'inbox');
+            if (inboxList.length > 0) {
+                lines.push('## Posteingang (Unsortiert)');
+                inboxList.forEach(t => {
+                    const box = t.completed ? '[x]' : '[ ]';
+                    const datePart = t.dueDate ? ` _(Fällig: ${t.dueDate})_` : '';
+                    lines.push(`- ${box} **${t.title}**${datePart}`);
+                    if (t.note) lines.push(`  - ${t.note}`);
+                });
+                lines.push('');
+            }
+
             QUADRANTS.forEach(q => {
                 lines.push(`## ${q.code}: ${q.title} (${q.subtitle})`);
                 const qTasks = state.tasks.filter(t => t.quadrant === q.id);
@@ -2440,14 +2941,14 @@
         searchInput.addEventListener('input', (e) => {
             state.search = e.target.value;
             searchClear.classList.toggle('hidden', !state.search);
-            renderMatrix();
+            renderAll();
         });
 
         searchClear.addEventListener('click', () => {
             state.search = '';
             searchInput.value = '';
             searchClear.classList.add('hidden');
-            renderMatrix();
+            renderAll();
             searchInput.focus();
         });
 
@@ -2484,9 +2985,10 @@
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
+
                 await setPersistence(auth, browserLocalPersistence);
                 await auth.authStateReady();
-                
+
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else if (!auth.currentUser) {
