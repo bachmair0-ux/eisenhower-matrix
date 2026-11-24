@@ -1,0 +1,2515 @@
+<!DOCTYPE html>
+<html lang="de" class="antialiased" data-theme="apple-light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Eisenhower-Matrix – Fokus &amp; Prioritäten</title>
+
+    <!-- Native iOS & Android Web-App Metadaten -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Eisenhower">
+    <meta id="meta-theme-color" name="theme-color" content="#F5F5F7">
+
+    <!-- Minimalistisches Apple-CI SVG-Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%2328282D'/%3E%3Cstop offset='100%25' stop-color='%23111114'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23bg)'/%3E%3Crect x='9' y='9' width='20.5' height='20.5' rx='5.5' fill='%23FF453A'/%3E%3Crect x='18' y='14' width='2.5' height='7' rx='1.25' fill='%23FFF'/%3E%3Ccircle cx='19.25' cy='24.2' r='1.4' fill='%23FFF'/%3E%3Crect x='34.5' y='9' width='20.5' height='20.5' rx='5.5' fill='%230A84FF'/%3E%3Ccircle cx='44.75' cy='19.25' r='5.2' fill='none' stroke='%23FFF' stroke-width='2'/%3E%3Cpath d='M44.75 16.5v2.9l2 1.3' fill='none' stroke='%23FFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='9' y='34.5' width='20.5' height='20.5' rx='5.5' fill='%23FF9F0A'/%3E%3Cpath d='M15 44.75h8.5m-3.2-3.2 3.2 3.2-3.2 3.2' fill='none' stroke='%23FFF' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='34.5' y='34.5' width='20.5' height='20.5' rx='5.5' fill='%238E8E93'/%3E%3Cpath d='M40.8 44.8l2.6 2.6 5.4-5.4' fill='none' stroke='%23FFF' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+    <!-- Platzhalter für dynamisch generiertes 180x180 PNG Apple-Touch-Icon & Web-App-Manifest -->
+    <link id="apple-touch-icon" rel="apple-touch-icon" sizes="180x180" href="">
+    <link id="app-manifest" rel="manifest" href="">
+
+    <!-- Sofortiges Inline-Script: Generiert gestochen scharfe PNG-Icons (180x180 & 512x512) per Canvas -->
+    <script>
+        (function generateNativeAppIcons() {
+            function drawRoundedRect(ctx, x, y, w, h, r) {
+                ctx.beginPath();
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + w - r, y);
+                ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                ctx.lineTo(x + w, y + h - r);
+                ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                ctx.lineTo(x + r, y + h);
+                ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                ctx.lineTo(x, y + r);
+                ctx.quadraticCurveTo(x, y, x + r, y);
+                ctx.closePath();
+            }
+
+            function renderIconPng(size) {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return '';
+
+                const s = size / 180;
+
+                // Vollflächiger dunkler Apple-App-Hintergrund (ohne Transparenz für iOS Squircle)
+                const bgGrad = ctx.createLinearGradient(0, 0, 0, size);
+                bgGrad.addColorStop(0, '#28282E');
+                bgGrad.addColorStop(0.5, '#1B1B20');
+                bgGrad.addColorStop(1, '#101013');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, size, size);
+
+                // Dezentes Top-Licht
+                const shine = ctx.createRadialGradient(size * 0.5, 0, size * 0.05, size * 0.5, 0, size * 0.78);
+                shine.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+                shine.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                ctx.fillStyle = shine;
+                ctx.fillRect(0, 0, size, size);
+
+                // 2x2 Apple-CI Quadranten-Kacheln
+                const pad = 25 * s;
+                const gap = 14 * s;
+                const tile = (size - pad * 2 - gap) / 2;
+                const radius = 15 * s;
+
+                const tiles = [
+                    { x: pad, y: pad, c1: '#FF453A', c2: '#DF2920', type: 'q1' },
+                    { x: pad + tile + gap, y: pad, c1: '#0A84FF', c2: '#0062CC', type: 'q2' },
+                    { x: pad, y: pad + tile + gap, c1: '#FF9F0A', c2: '#E07D00', type: 'q3' },
+                    { x: pad + tile + gap, y: pad + tile + gap, c1: '#98989D', c2: '#75757A', type: 'q4' }
+                ];
+
+                tiles.forEach(t => {
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.36)';
+                    ctx.shadowBlur = 10 * s;
+                    ctx.shadowOffsetY = 4 * s;
+
+                    const grad = ctx.createLinearGradient(t.x, t.y, t.x, t.y + tile);
+                    grad.addColorStop(0, t.c1);
+                    grad.addColorStop(1, t.c2);
+                    ctx.fillStyle = grad;
+                    drawRoundedRect(ctx, t.x, t.y, tile, tile, radius);
+                    ctx.fill();
+                    ctx.restore();
+
+                    // Feine innere Highlight-Kante
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+                    ctx.lineWidth = 1.2 * s;
+                    drawRoundedRect(ctx, t.x + 0.6 * s, t.y + 0.6 * s, tile - 1.2 * s, tile - 1.2 * s, radius);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // Minimalistische weiße Piktogramme
+                    const cx = t.x + tile / 2;
+                    const cy = t.y + tile / 2;
+                    ctx.save();
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.strokeStyle = '#FFFFFF';
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+
+                    if (t.type === 'q1') {
+                        drawRoundedRect(ctx, cx - 3.2 * s, cy - 13 * s, 6.4 * s, 16.5 * s, 3.2 * s);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(cx, cy + 10.5 * s, 3.4 * s, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (t.type === 'q2') {
+                        ctx.lineWidth = 4.2 * s;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, 13 * s, 0, Math.PI * 2);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(cx, cy - 6.8 * s);
+                        ctx.lineTo(cx, cy);
+                        ctx.lineTo(cx + 5.2 * s, cy + 3.2 * s);
+                        ctx.stroke();
+                    } else if (t.type === 'q3') {
+                        ctx.lineWidth = 4.6 * s;
+                        ctx.beginPath();
+                        ctx.moveTo(cx - 11 * s, cy);
+                        ctx.lineTo(cx + 10 * s, cy);
+                        ctx.moveTo(cx + 2 * s, cy - 8.2 * s);
+                        ctx.lineTo(cx + 10.5 * s, cy);
+                        ctx.lineTo(cx + 2 * s, cy + 8.2 * s);
+                        ctx.stroke();
+                    } else if (t.type === 'q4') {
+                        ctx.lineWidth = 4.8 * s;
+                        ctx.beginPath();
+                        ctx.moveTo(cx - 10 * s, cy + 0.5 * s);
+                        ctx.lineTo(cx - 3 * s, cy + 7.5 * s);
+                        ctx.lineTo(cx + 10.5 * s, cy - 6.5 * s);
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                });
+
+                return canvas.toDataURL('image/png');
+            }
+
+            try {
+                const icon180 = renderIconPng(180);
+                const appleLink = document.getElementById('apple-touch-icon');
+                if (appleLink && icon180) {
+                    appleLink.href = icon180;
+                }
+
+                const icon512 = renderIconPng(512);
+                const manifest = {
+                    name: 'Eisenhower-Matrix',
+                    short_name: 'Eisenhower',
+                    description: 'Prioritäten klar ordnen & fokussiert bleiben – im Apple-CI-Design mit Echtzeit-Cloud-Sync.',
+                    start_url: './',
+                    display: 'standalone',
+                    background_color: '#000000',
+                    theme_color: '#F5F5F7',
+                    icons: [
+                        { src: icon180, sizes: '180x180', type: 'image/png', purpose: 'any' },
+                        { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+                    ]
+                };
+                const manifestLink = document.getElementById('app-manifest');
+                if (manifestLink && icon512) {
+                    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+                    manifestLink.href = URL.createObjectURL(blob);
+                }
+            } catch (err) {
+                console.warn('App-Icon konnte nicht generiert werden:', err);
+            }
+        })();
+    </script>
+
+    <!-- Tailwind CSS CDN für Layout & Utility-Raster -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Reines Apple-CI Design-System (Apple Hell & Apple Dunkel) -->
+    <style>
+        /* =========================================================
+           APPLE HELL (Standard) – macOS / iOS Light Mode Tokens
+           ========================================================= */
+        :root,
+        html[data-theme="apple-light"] {
+            color-scheme: light;
+            --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, "Helvetica Neue", sans-serif;
+
+            --bg-page: #F5F5F7;
+            --bg-mesh:
+                radial-gradient(at 0% 0%, rgba(0, 122, 255, 0.085) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(255, 149, 0, 0.06) 0px, transparent 48%),
+                radial-gradient(at 100% 100%, rgba(52, 199, 89, 0.06) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(255, 59, 48, 0.045) 0px, transparent 45%);
+
+            --header-glass: rgba(245, 245, 247, 0.78);
+            --card-glass: rgba(255, 255, 255, 0.78);
+            --card-blur: 20px;
+            --task-surface: rgba(255, 255, 255, 0.88);
+            --task-surface-hover: #FFFFFF;
+            --task-surface-done: rgba(255, 255, 255, 0.52);
+            --modal-glass: rgba(255, 255, 255, 0.88);
+            --surface-subtle: rgba(118, 118, 128, 0.09);
+            --surface-pill: rgba(255, 255, 255, 0.84);
+            --surface-pill-hover: #FFFFFF;
+            --input-bg: rgba(255, 255, 255, 0.88);
+            --input-bg-focus: #FFFFFF;
+            --segmented-bg: rgba(118, 118, 128, 0.12);
+            --segmented-active: #FFFFFF;
+
+            --border-hairline: rgba(0, 0, 0, 0.08);
+            --border-strong: rgba(0, 0, 0, 0.14);
+            --border-dashed: rgba(0, 0, 0, 0.14);
+
+            --text-primary: #1D1D1F;
+            --text-secondary: #6E6E73;
+            --text-tertiary: #8E8E93;
+
+            --sys-red: #FF3B30;
+            --sys-red-soft: rgba(255, 59, 48, 0.12);
+            --sys-blue: #007AFF;
+            --sys-blue-hover: #0066D6;
+            --sys-blue-soft: rgba(0, 122, 255, 0.12);
+            --sys-orange: #FF9500;
+            --sys-orange-soft: rgba(255, 149, 0, 0.14);
+            --sys-gray: #8E8E93;
+            --sys-gray-soft: rgba(142, 142, 147, 0.14);
+            --sys-green: #34C759;
+            --sys-green-soft: rgba(52, 199, 89, 0.14);
+
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+            --shadow-card-hover: 0 14px 36px rgba(0, 0, 0, 0.065), 0 2px 6px rgba(0, 0, 0, 0.035);
+            --shadow-pill: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.16);
+            --backdrop-dim: rgba(0, 0, 0, 0.36);
+        }
+
+        /* =========================================================
+           APPLE DUNKEL – macOS / iOS Dark Mode Tokens
+           ========================================================= */
+        html[data-theme="apple-dark"] {
+            color-scheme: dark;
+            --bg-page: #000000;
+            --bg-mesh:
+                radial-gradient(at 0% 0%, rgba(10, 132, 255, 0.16) 0px, transparent 48%),
+                radial-gradient(at 100% 0%, rgba(255, 159, 10, 0.09) 0px, transparent 44%),
+                radial-gradient(at 100% 100%, rgba(48, 209, 88, 0.09) 0px, transparent 48%),
+                radial-gradient(at 0% 100%, rgba(255, 69, 58, 0.08) 0px, transparent 44%);
+
+            --header-glass: rgba(11, 11, 13, 0.78);
+            --card-glass: rgba(28, 28, 30, 0.78);
+            --card-blur: 24px;
+            --task-surface: rgba(44, 44, 46, 0.72);
+            --task-surface-hover: rgba(58, 58, 60, 0.82);
+            --task-surface-done: rgba(28, 28, 30, 0.56);
+            --modal-glass: rgba(28, 28, 30, 0.88);
+            --surface-subtle: rgba(118, 118, 128, 0.22);
+            --surface-pill: rgba(44, 44, 46, 0.78);
+            --surface-pill-hover: rgba(58, 58, 60, 0.92);
+            --input-bg: rgba(44, 44, 46, 0.78);
+            --input-bg-focus: rgba(58, 58, 60, 0.92);
+            --segmented-bg: rgba(118, 118, 128, 0.24);
+            --segmented-active: rgba(99, 99, 102, 0.65);
+
+            --border-hairline: rgba(255, 255, 255, 0.12);
+            --border-strong: rgba(255, 255, 255, 0.2);
+            --border-dashed: rgba(255, 255, 255, 0.16);
+
+            --text-primary: #F5F5F7;
+            --text-secondary: #98989D;
+            --text-tertiary: #636366;
+
+            --sys-red: #FF453A;
+            --sys-red-soft: rgba(255, 69, 58, 0.2);
+            --sys-blue: #0A84FF;
+            --sys-blue-hover: #409CFF;
+            --sys-blue-soft: rgba(10, 132, 255, 0.2);
+            --sys-orange: #FF9F0A;
+            --sys-orange-soft: rgba(255, 159, 10, 0.2);
+            --sys-gray: #8E8E93;
+            --sys-gray-soft: rgba(142, 142, 147, 0.22);
+            --sys-green: #30D158;
+            --sys-green-soft: rgba(48, 209, 88, 0.2);
+
+            --shadow-card: 0 12px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            --shadow-card-hover: 0 16px 44px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            --shadow-pill: 0 1px 3px rgba(0, 0, 0, 0.35);
+            --shadow-modal: 0 28px 72px rgba(0, 0, 0, 0.72);
+            --backdrop-dim: rgba(0, 0, 0, 0.64);
+        }
+
+        /* =========================================================
+           BASIS & SAFE-AREA LAYOUT
+           ========================================================= */
+        html, body {
+            font-family: var(--font-apple);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            background-image: var(--bg-mesh);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        ::selection {
+            background: var(--sys-blue-soft);
+            color: var(--text-primary);
+        }
+
+        header.apple-header {
+            background: var(--header-glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid var(--border-hairline);
+            padding-top: env(safe-area-inset-top);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+
+        main.apple-main {
+            padding-bottom: calc(1.75rem + env(safe-area-inset-bottom));
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+
+        #toast-container {
+            bottom: calc(1rem + env(safe-area-inset-bottom));
+        }
+
+        /* Typografie-Helfer */
+        .text-apple-primary { color: var(--text-primary); }
+        .text-apple-secondary { color: var(--text-secondary); }
+        .text-apple-tertiary { color: var(--text-tertiary); }
+
+        /* App-Logo-Box */
+        .apple-logo-box {
+            background: linear-gradient(180deg, #0A84FF 0%, #007AFF 100%);
+            border-radius: 13px;
+            box-shadow: 0 4px 14px rgba(0, 122, 255, 0.32);
+        }
+
+        /* Fortschrittskarte */
+        .apple-progress-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border: 1px solid var(--border-hairline);
+            border-radius: 18px;
+        }
+
+        .apple-progress-track {
+            background: var(--surface-subtle);
+        }
+
+        #progress-bar {
+            background: linear-gradient(90deg, var(--sys-blue) 0%, var(--sys-green) 100%);
+        }
+
+        /* Segmented Control (macOS / iOS Stil) */
+        .apple-segmented {
+            background: var(--segmented-bg);
+            border-radius: 9999px;
+            padding: 3px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .apple-seg-btn {
+            border-radius: 9999px;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .apple-seg-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .apple-seg-btn.is-active {
+            background: var(--segmented-active);
+            color: var(--text-primary);
+            font-weight: 600;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Pill-Buttons */
+        .apple-pill-btn {
+            border-radius: 9999px;
+            border: 1px solid var(--border-hairline);
+            background: var(--surface-pill);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-pill);
+            transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.15s ease, color 0.18s ease;
+        }
+
+        .apple-pill-btn:hover {
+            background: var(--surface-pill-hover);
+            border-color: var(--border-strong);
+        }
+
+        .apple-pill-btn:active {
+            transform: scale(0.98);
+        }
+
+        .apple-primary-btn {
+            border-radius: 9999px;
+            background: var(--sys-blue);
+            color: #FFFFFF;
+            font-weight: 600;
+            transition: background-color 0.18s ease, transform 0.15s ease;
+        }
+
+        .apple-primary-btn:hover {
+            background: var(--sys-blue-hover);
+        }
+
+        .apple-primary-btn:active {
+            transform: scale(0.98);
+        }
+
+        .apple-danger-btn {
+            border-radius: 9999px;
+            background: var(--sys-red);
+            color: #FFFFFF;
+            font-weight: 600;
+            transition: opacity 0.18s ease, transform 0.15s ease;
+        }
+
+        .apple-danger-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Eingabefelder */
+        .apple-input {
+            background: var(--input-bg);
+            border: 1px solid var(--border-hairline);
+            border-radius: 14px;
+            color: var(--text-primary);
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+        }
+
+        .apple-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .apple-input:focus {
+            outline: none;
+            background: var(--input-bg-focus);
+            border-color: var(--sys-blue);
+            box-shadow: 0 0 0 3.5px var(--sys-blue-soft);
+        }
+
+        /* Quadranten-Karten (Transluzentes Glas) */
+        .quadrant-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(var(--card-blur)) saturate(175%);
+            -webkit-backdrop-filter: blur(var(--card-blur)) saturate(175%);
+            border: 1px solid var(--border-hairline);
+            border-top-width: 3px;
+            border-radius: 22px;
+            box-shadow: var(--shadow-card);
+            transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .quadrant-card:hover {
+            box-shadow: var(--shadow-card-hover);
+        }
+
+        .quadrant-card[data-quadrant="do"] { border-top-color: var(--sys-red); }
+        .quadrant-card[data-quadrant="schedule"] { border-top-color: var(--sys-blue); }
+        .quadrant-card[data-quadrant="delegate"] { border-top-color: var(--sys-orange); }
+        .quadrant-card[data-quadrant="eliminate"] { border-top-color: var(--sys-gray); }
+
+        .quadrant-card.drop-active-do { box-shadow: 0 0 0 2.5px var(--sys-red), var(--shadow-card-hover); }
+        .quadrant-card.drop-active-schedule { box-shadow: 0 0 0 2.5px var(--sys-blue), var(--shadow-card-hover); }
+        .quadrant-card.drop-active-delegate { box-shadow: 0 0 0 2.5px var(--sys-orange), var(--shadow-card-hover); }
+        .quadrant-card.drop-active-eliminate { box-shadow: 0 0 0 2.5px var(--sys-gray), var(--shadow-card-hover); }
+
+        /* Aufgaben-Karten */
+        .task-card {
+            background: var(--task-surface);
+            border: 1px solid var(--border-hairline);
+            border-radius: 16px;
+            transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease, opacity 0.18s ease;
+        }
+
+        .task-card:hover {
+            background: var(--task-surface-hover);
+            border-color: var(--border-strong);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        }
+
+        .task-card.is-completed {
+            background: var(--task-surface-done);
+            opacity: 0.72;
+        }
+
+        /* Empty-State */
+        .apple-empty-box {
+            border: 1px dashed var(--border-dashed);
+            border-radius: 16px;
+            color: var(--text-tertiary);
+        }
+
+        /* Modals */
+        .apple-modal-backdrop {
+            background: var(--backdrop-dim);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .apple-modal-panel {
+            background: var(--modal-glass);
+            backdrop-filter: blur(28px) saturate(185%);
+            -webkit-backdrop-filter: blur(28px) saturate(185%);
+            border: 1px solid var(--border-hairline);
+            border-radius: 24px;
+            box-shadow: var(--shadow-modal);
+        }
+
+        .apple-divider {
+            border-color: var(--border-hairline);
+        }
+
+        .apple-info-box {
+            background: var(--surface-subtle);
+            border: 1px solid var(--border-hairline);
+            border-radius: 16px;
+        }
+
+        /* Quadranten-Farbklassen */
+        .q-badge-do { background: var(--sys-red-soft); color: var(--sys-red); }
+        .q-badge-schedule { background: var(--sys-blue-soft); color: var(--sys-blue); }
+        .q-badge-delegate { background: var(--sys-orange-soft); color: var(--sys-orange); }
+        .q-badge-eliminate { background: var(--sys-gray-soft); color: var(--sys-gray); }
+
+        .q-btn-do { background: var(--sys-red); color: #FFFFFF; border-radius: 9999px; }
+        .q-btn-schedule { background: var(--sys-blue); color: #FFFFFF; border-radius: 9999px; }
+        .q-btn-delegate { background: var(--sys-orange); color: #FFFFFF; border-radius: 9999px; }
+        .q-btn-eliminate { background: var(--sys-gray); color: #FFFFFF; border-radius: 9999px; }
+
+        .q-btn-do:hover, .q-btn-schedule:hover, .q-btn-delegate:hover, .q-btn-eliminate:hover {
+            filter: brightness(1.06);
+        }
+
+        /* Sync-Status-Farben */
+        .sync-pill-synced {
+            border-color: var(--sys-green-soft);
+            background: var(--sys-green-soft);
+            color: var(--sys-green);
+        }
+
+        .sync-pill-syncing {
+            border-color: var(--sys-blue-soft);
+            background: var(--sys-blue-soft);
+            color: var(--sys-blue);
+        }
+
+        .sync-pill-offline {
+            border-color: var(--sys-orange-soft);
+            background: var(--sys-orange-soft);
+            color: var(--sys-orange);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Konfetti-Canvas Overlay -->
+    <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <!-- Toast-Benachrichtigungen -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-[calc(100%-2rem)] sm:w-auto pointer-events-none"></div>
+
+    <!-- Header -->
+    <header class="apple-header sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+
+                <!-- Logo & Titel -->
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="apple-logo-box w-10 h-10 flex items-center justify-center text-white shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="3" y="3" width="7" height="7" rx="1.8"></rect>
+                                <rect x="14" y="3" width="7" height="7" rx="1.8"></rect>
+                                <rect x="14" y="14" width="7" height="7" rx="1.8"></rect>
+                                <rect x="3" y="14" width="7" height="7" rx="1.8"></rect>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-lg sm:text-xl font-bold tracking-tight text-apple-primary leading-tight">
+                                Eisenhower-Matrix
+                            </h1>
+                            <p class="text-xs sm:text-sm text-apple-secondary">
+                                Prioritäten klar ordnen &amp; fokussiert bleiben
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fortschrittsanzeige -->
+                <div class="apple-progress-card flex-1 max-w-md w-full lg:mx-4 px-4 py-3">
+                    <div class="flex items-center justify-between text-xs font-medium mb-1.5">
+                        <span id="progress-motivation" class="text-apple-primary truncate pr-2">
+                            Bereit für einen produktiven Tag!
+                        </span>
+                        <span id="progress-stats" class="text-apple-secondary shrink-0 tabular-nums">
+                            0 / 0 erledigt (0 %)
+                        </span>
+                    </div>
+                    <div class="apple-progress-track w-full h-2 rounded-full overflow-hidden">
+                        <div id="progress-bar" class="h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Aktionen (Sync, Konto, Export/Import, Bereinigen, 2-Wege Apple Theme-Switcher) -->
+                <div class="flex items-center flex-wrap gap-2">
+                    <!-- Cloud-Sync Status Badge -->
+                    <div id="sync-status-badge" title="Status der Cloud-Synchronisation"
+                        class="apple-pill-btn sync-pill-syncing inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold">
+                        <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-current animate-pulse"></span>
+                        <span id="sync-status-text">Verbinde...</span>
+                    </div>
+
+                    <!-- Konto-Button -->
+                    <button id="btn-open-account" type="button"
+                        class="apple-pill-btn inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-medium">
+                        <svg class="w-4 h-4 shrink-0" style="color: var(--sys-blue);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span id="account-btn-label" class="max-w-[120px] truncate">Konto</span>
+                    </button>
+
+                    <!-- Export / Import -->
+                    <button id="btn-open-export" type="button"
+                        class="apple-pill-btn inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-medium">
+                        <svg class="w-4 h-4 text-apple-secondary shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Export / Import</span>
+                    </button>
+
+                    <!-- Erledigte bereinigen -->
+                    <button id="btn-clear-completed" type="button"
+                        class="apple-pill-btn inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-medium disabled:opacity-40 disabled:pointer-events-none">
+                        <svg class="w-4 h-4 shrink-0" style="color: var(--sys-red);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                            <path d="M10 11v6M14 11v6"></path>
+                        </svg>
+                        <span class="hidden sm:inline">Bereinigen</span>
+                    </button>
+
+                    <!-- 2-Wege Apple Theme-Switcher (Hell / Dunkel) -->
+                    <div class="apple-segmented" role="group" aria-label="Erscheinungsbild wählen">
+                        <button type="button" data-theme-choice="apple-light" title="Apple Hell"
+                            class="theme-btn apple-seg-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="12" cy="12" r="4"></circle>
+                                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+                            </svg>
+                            <span>Hell</span>
+                        </button>
+                        <button type="button" data-theme-choice="apple-dark" title="Apple Dunkel"
+                            class="theme-btn apple-seg-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                            <span>Dunkel</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter- & Suchleiste -->
+            <div class="apple-divider mt-4 pt-3 border-t flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <!-- Suchfeld -->
+                <div class="relative flex-1 max-w-md">
+                    <svg class="w-4 h-4 text-apple-tertiary absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input id="search-input" type="text" placeholder="Aufgaben durchsuchen (Titel oder Notiz)..."
+                        class="apple-input w-full pl-10 pr-9 py-2 text-sm">
+                    <button id="search-clear" type="button" aria-label="Suche leeren"
+                        class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-apple-tertiary hover:text-apple-primary transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Status-Filter (Segmented Control) -->
+                <div class="apple-segmented self-start sm:self-auto" role="group" aria-label="Aufgaben filtern">
+                    <button type="button" data-filter="all" class="filter-btn apple-seg-btn px-3.5 py-1.5 text-xs sm:text-sm">
+                        Alle
+                    </button>
+                    <button type="button" data-filter="open" class="filter-btn apple-seg-btn px-3.5 py-1.5 text-xs sm:text-sm">
+                        Offen
+                    </button>
+                    <button type="button" data-filter="completed" class="filter-btn apple-seg-btn px-3.5 py-1.5 text-xs sm:text-sm">
+                        Erledigt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hauptbereich: 2x2 Eisenhower-Matrix -->
+    <main class="apple-main flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Spaltenbeschriftung (Desktop) -->
+        <div class="hidden lg:grid lg:grid-cols-2 gap-6 mb-3 px-2">
+            <div class="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wider text-apple-secondary">
+                <span class="w-2 h-2 rounded-full" style="background: var(--sys-red);"></span>
+                <span>Dringend</span>
+            </div>
+            <div class="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wider text-apple-secondary">
+                <span class="w-2 h-2 rounded-full" style="background: var(--sys-blue);"></span>
+                <span>Nicht dringend</span>
+            </div>
+        </div>
+
+        <!-- 2x2 Quadranten-Grid -->
+        <div id="matrix-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
+            <!-- Quadranten werden dynamisch gerendert -->
+        </div>
+
+        <p class="mt-6 text-center text-xs text-apple-tertiary">
+            Tipp: Aufgaben lassen sich per Drag-and-Drop zwischen den Quadranten verschieben oder per Klick bearbeiten. Alle Änderungen werden live in der Cloud synchronisiert.
+        </p>
+    </main>
+
+    <!-- Modal: Aufgabe bearbeiten -->
+    <div id="edit-modal" class="apple-modal-backdrop fixed inset-0 z-40 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+        <div class="apple-modal-panel w-full max-w-lg overflow-hidden">
+            <div class="apple-divider px-6 py-4 border-b flex items-center justify-between">
+                <h2 id="edit-modal-title" class="text-base font-semibold text-apple-primary">
+                    Aufgabe bearbeiten
+                </h2>
+                <button id="edit-modal-close" type="button" aria-label="Dialog schließen"
+                    class="p-1.5 rounded-full text-apple-secondary hover:text-apple-primary transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="edit-task-form" class="p-6 space-y-4">
+                <input type="hidden" id="edit-task-id">
+
+                <div>
+                    <label for="edit-task-title" class="block text-xs font-semibold uppercase tracking-wide text-apple-secondary mb-1.5">
+                        Titel *
+                    </label>
+                    <input id="edit-task-title" type="text" required maxlength="140" class="apple-input w-full px-3.5 py-2.5 text-sm">
+                </div>
+
+                <div>
+                    <label for="edit-task-note" class="block text-xs font-semibold uppercase tracking-wide text-apple-secondary mb-1.5">
+                        Notiz (optional)
+                    </label>
+                    <textarea id="edit-task-note" rows="3" maxlength="500" placeholder="Kurze Details, Links oder nächste Schritte..."
+                        class="apple-input w-full px-3.5 py-2.5 text-sm resize-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit-task-date" class="block text-xs font-semibold uppercase tracking-wide text-apple-secondary mb-1.5">
+                            Fälligkeitsdatum
+                        </label>
+                        <input id="edit-task-date" type="date" class="apple-input w-full px-3.5 py-2.5 text-sm">
+                    </div>
+
+                    <div>
+                        <label for="edit-task-quadrant" class="block text-xs font-semibold uppercase tracking-wide text-apple-secondary mb-1.5">
+                            Quadrant verschieben
+                        </label>
+                        <select id="edit-task-quadrant" class="apple-input w-full px-3.5 py-2.5 text-sm">
+                            <option value="do">Q1: Sofort erledigen</option>
+                            <option value="schedule">Q2: Terminieren &amp; Planen</option>
+                            <option value="delegate">Q3: Delegieren</option>
+                            <option value="eliminate">Q4: Eliminieren</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="apple-divider pt-4 border-t flex flex-wrap items-center justify-between gap-3">
+                    <button id="edit-task-delete" type="button"
+                        class="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-full transition-colors"
+                        style="color: var(--sys-red); background: var(--sys-red-soft);">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                        </svg>
+                        <span>Löschen</span>
+                    </button>
+
+                    <div class="flex items-center gap-2">
+                        <button id="edit-task-cancel" type="button" class="apple-pill-btn px-4 py-2 text-sm font-medium">
+                            Abbrechen
+                        </button>
+                        <button type="submit" class="apple-primary-btn px-5 py-2 text-sm">
+                            Speichern
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Exportieren & Importieren -->
+    <div id="export-modal" class="apple-modal-backdrop fixed inset-0 z-40 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
+        <div class="apple-modal-panel w-full max-w-xl overflow-hidden">
+            <div class="apple-divider px-6 py-4 border-b flex items-center justify-between">
+                <h2 id="export-modal-title" class="text-base font-semibold text-apple-primary">
+                    Daten exportieren &amp; importieren
+                </h2>
+                <button id="export-modal-close" type="button" aria-label="Dialog schließen"
+                    class="p-1.5 rounded-full text-apple-secondary hover:text-apple-primary transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div class="apple-segmented flex-wrap">
+                    <button id="export-tab-md" type="button" class="apple-seg-btn px-3.5 py-1.5 text-xs sm:text-sm">
+                        Markdown Export
+                    </button>
+                    <button id="export-tab-json" type="button" class="apple-seg-btn px-3.5 py-1.5 text-xs sm:text-sm">
+                        JSON Export
+                    </button>
+                    <button id="export-tab-import" type="button" class="apple-seg-btn px-3.5 py-1.5 text-xs sm:text-sm">
+                        JSON Import
+                    </button>
+                </div>
+
+                <!-- Ansicht: Export -->
+                <div id="export-view" class="space-y-4">
+                    <textarea id="export-preview" readonly rows="10"
+                        class="apple-input w-full p-3.5 text-xs font-mono resize-none"></textarea>
+
+                    <div class="flex flex-wrap items-center justify-end gap-2 pt-1">
+                        <button id="btn-download-export" type="button"
+                            class="apple-pill-btn inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <span>Als Datei laden</span>
+                        </button>
+                        <button id="btn-copy-export" type="button"
+                            class="apple-primary-btn inline-flex items-center gap-1.5 px-4 py-2 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            <span>In Zwischenablage kopieren</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ansicht: JSON Import -->
+                <div id="import-view" class="hidden space-y-4">
+                    <div class="apple-info-box flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5">
+                        <p class="text-xs text-apple-secondary">
+                            Wähle eine exportierte <code class="font-mono text-apple-primary">.json</code>-Datei aus oder füge den JSON-Text unten ein.
+                        </p>
+                        <label class="apple-pill-btn inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 text-xs font-medium cursor-pointer shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span>Datei wählen</span>
+                            <input id="import-file-input" type="file" accept=".json,application/json" class="hidden">
+                        </label>
+                    </div>
+
+                    <textarea id="import-textarea" rows="8" placeholder='{"tasks": [{"title": "Beispielaufgabe", "quadrant": "do"}]}'
+                        class="apple-input w-full p-3.5 text-xs font-mono resize-none"></textarea>
+
+                    <div class="flex items-center justify-end gap-2 pt-1">
+                        <button id="btn-run-import" type="button"
+                            class="apple-primary-btn inline-flex items-center gap-1.5 px-5 py-2 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>Aufgaben importieren</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Konto & Cloud-Sync (iOS Safari freundlich) -->
+    <div id="account-modal" class="apple-modal-backdrop fixed inset-0 z-40 hidden items-center justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="account-modal-title">
+        <div class="apple-modal-panel w-full max-w-md overflow-hidden my-auto">
+            <div class="apple-divider px-6 py-4 border-b flex items-center justify-between">
+                <h2 id="account-modal-title" class="text-base font-semibold text-apple-primary">
+                    Konto &amp; Cloud-Sync
+                </h2>
+                <button id="account-modal-close" type="button" aria-label="Dialog schließen"
+                    class="p-1.5 rounded-full text-apple-secondary hover:text-apple-primary transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <!-- Aktueller Nutzerstatus -->
+                <div class="apple-info-box p-4 space-y-1.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-semibold uppercase tracking-wide text-apple-secondary">Aktueller Status</span>
+                        <span id="account-status-pill" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
+                            Gast-Konto
+                        </span>
+                    </div>
+                    <p id="account-email-display" class="text-sm font-semibold text-apple-primary break-all">
+                        Anonym angemeldet
+                    </p>
+                    <p class="text-[11px] text-apple-secondary break-all font-mono">
+                        Nutzer-ID: <span id="account-uid-display">–</span>
+                    </p>
+                </div>
+
+                <!-- Rückmeldung im Modal -->
+                <div id="account-feedback" class="hidden p-3.5 rounded-2xl text-xs font-medium"></div>
+
+                <!-- Bereich für Gast-Nutzer -->
+                <div id="account-guest-actions" class="space-y-4">
+                    <!-- Zwei klar getrennte Google-Buttons (iOS Safari freundlich) -->
+                    <div class="space-y-2.5">
+                        <button id="btn-google-signin" type="button"
+                            class="apple-pill-btn w-full flex items-center justify-center gap-2.5 px-4 py-2.5 text-sm font-semibold">
+                            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill="#4285F4" d="M23.745 12.27c0-.79-.07-1.54-.19-2.27h-11.3v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+                                <path fill="#34A853" d="M12.255 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96h-3.98v3.09C3.515 21.3 7.565 24 12.255 24z"/>
+                                <path fill="#FBBC05" d="M5.525 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62h-3.98a11.86 11.86 0 0 0 0 10.76l3.98-3.09z"/>
+                                <path fill="#EA4335" d="M12.255 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C18.205 1.19 15.495 0 12.255 0c-4.69 0-8.74 2.7-10.71 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
+                            </svg>
+                            <span>Mit bestehendem Google-Konto anmelden</span>
+                        </button>
+
+                        <button id="btn-google-link" type="button"
+                            class="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium rounded-full text-apple-secondary hover:text-apple-primary transition-colors"
+                            style="border: 1px dashed var(--border-dashed);">
+                            <span>Gast-Konto mit Google verknüpfen (Aufgaben mitnehmen)</span>
+                        </button>
+                    </div>
+
+                    <div class="relative flex items-center py-0.5">
+                        <div class="apple-divider flex-grow border-t"></div>
+                        <span class="shrink mx-3 text-[11px] font-medium uppercase tracking-wider text-apple-tertiary">oder per E-Mail</span>
+                        <div class="apple-divider flex-grow border-t"></div>
+                    </div>
+
+                    <!-- E-Mail & Passwort mit 2-Wege-Umschalter -->
+                    <div class="space-y-3">
+                        <div class="apple-segmented w-full grid grid-cols-2" role="tablist">
+                            <button id="email-tab-login" type="button" role="tab" class="apple-seg-btn px-3 py-1.5 text-xs text-center">
+                                Anmelden
+                            </button>
+                            <button id="email-tab-register" type="button" role="tab" class="apple-seg-btn px-3 py-1.5 text-xs text-center">
+                                Konto erstellen
+                            </button>
+                        </div>
+
+                        <form id="email-auth-form" class="space-y-3">
+                            <div>
+                                <label for="auth-email" class="block text-xs font-medium text-apple-secondary mb-1">E-Mail-Adresse</label>
+                                <input id="auth-email" type="email" required autocomplete="email" placeholder="name@beispiel.de"
+                                    class="apple-input w-full px-3.5 py-2.5 text-sm">
+                            </div>
+                            <div>
+                                <label for="auth-password" class="block text-xs font-medium text-apple-secondary mb-1">Passwort (mind. 6 Zeichen)</label>
+                                <input id="auth-password" type="password" required minlength="6" autocomplete="current-password" placeholder="••••••••"
+                                    class="apple-input w-full px-3.5 py-2.5 text-sm">
+                            </div>
+                            <button id="btn-email-submit" type="submit" class="apple-primary-btn w-full px-4 py-2.5 text-sm">
+                                Mit E-Mail anmelden
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Bereich für angemeldete Nutzer -->
+                <div id="account-signedin-actions" class="hidden space-y-3">
+                    <p class="text-xs text-apple-secondary leading-relaxed">
+                        Deine Aufgaben und dein Erscheinungsbild sind sicher mit deinem Konto verknüpft und werden automatisch auf allen angemeldeten Geräten synchronisiert.
+                    </p>
+                    <button id="btn-sign-out" type="button"
+                        class="w-full px-4 py-2.5 text-sm font-semibold rounded-full transition-colors"
+                        style="color: var(--sys-red); background: var(--sys-red-soft);">
+                        Abmelden
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Bestätigung für "Erledigte bereinigen" -->
+    <div id="confirm-modal" class="apple-modal-backdrop fixed inset-0 z-40 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+        <div class="apple-modal-panel w-full max-w-sm p-6 space-y-4">
+            <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style="background: var(--sys-red-soft); color: var(--sys-red);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                        <path d="M10 11v6M14 11v6"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 id="confirm-modal-title" class="text-base font-semibold text-apple-primary">
+                        Erledigte Aufgaben bereinigen?
+                    </h2>
+                    <p id="confirm-modal-desc" class="mt-1 text-sm text-apple-secondary">
+                        Alle als erledigt markierten Aufgaben werden dauerhaft entfernt.
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button id="confirm-cancel" type="button" class="apple-pill-btn px-4 py-2 text-sm font-medium">
+                    Abbrechen
+                </button>
+                <button id="confirm-accept" type="button" class="apple-danger-btn px-5 py-2 text-sm">
+                    Bereinigen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        /**
+         * ============================================================================
+         * EISENHOWER-MATRIX – REINES APPLE-CI DESIGN (APPLE HELL & APPLE DUNKEL)
+         * Firebase v11 Auth & Firestore Echtzeit-Sync unter:
+         * artifacts/{appId}/users/{userId}/eisenhower/state
+         * ============================================================================
+         */
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            signInAnonymously,
+            signInWithCustomToken,
+            onAuthStateChanged,
+            GoogleAuthProvider,
+            EmailAuthProvider,
+            signInWithPopup,
+            linkWithPopup,
+            linkWithCredential,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            onSnapshot
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase-Konfiguration (direkt einsatzbereit für Vorschau & Netlify) ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'eisenhower-matrix-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined'
+            ? JSON.parse(__firebase_config)
+            : {
+                apiKey: "AIzaSyD2abAspuClDhB-vNN06FNWQnwgG27SX0E",
+                authDomain: "eisenhower-matrix-c0d70.firebaseapp.com",
+                projectId: "eisenhower-matrix-c0d70",
+                storageBucket: "eisenhower-matrix-c0d70.firebasestorage.app",
+                messagingSenderId: "728080490230",
+                appId: "1:728080490230:web:a429281700b0e51aac96d7"
+            };
+
+        let app = null;
+        let auth = null;
+        let db = null;
+        let currentUser = null;
+        let unsubscribeMatrix = null;
+
+        const THEME_STORAGE_KEY = 'eisenhower_matrix_theme_v1';
+        const LOCAL_CACHE_KEY = 'eisenhower_matrix_tasks_cache_v1';
+
+        /**
+         * Definition der 4 Eisenhower-Quadranten mit Apple-Systemfarben.
+         */
+        const QUADRANTS = [
+            {
+                id: 'do',
+                code: 'Q1',
+                title: 'Sofort erledigen',
+                subtitle: 'Wichtig & Dringend',
+                placeholder: 'Dringende Aufgabe hinzufügen...',
+                badgeClass: 'q-badge-do',
+                btnClass: 'q-btn-do',
+                dropClass: 'drop-active-do',
+                colorVar: 'var(--sys-red)',
+                icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>`
+            },
+            {
+                id: 'schedule',
+                code: 'Q2',
+                title: 'Terminieren & Planen',
+                subtitle: 'Wichtig & Nicht dringend',
+                placeholder: 'Strategische Aufgabe planen...',
+                badgeClass: 'q-badge-schedule',
+                btnClass: 'q-btn-schedule',
+                dropClass: 'drop-active-schedule',
+                colorVar: 'var(--sys-blue)',
+                icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2.5"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`
+            },
+            {
+                id: 'delegate',
+                code: 'Q3',
+                title: 'Delegieren',
+                subtitle: 'Nicht wichtig & Dringend',
+                placeholder: 'Aufgabe zum Delegieren notieren...',
+                badgeClass: 'q-badge-delegate',
+                btnClass: 'q-btn-delegate',
+                dropClass: 'drop-active-delegate',
+                colorVar: 'var(--sys-orange)',
+                icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`
+            },
+            {
+                id: 'eliminate',
+                code: 'Q4',
+                title: 'Eliminieren',
+                subtitle: 'Nicht wichtig & Nicht dringend',
+                placeholder: 'Zeitfresser oder Unwichtiges erfassen...',
+                badgeClass: 'q-badge-eliminate',
+                btnClass: 'q-btn-eliminate',
+                dropClass: 'drop-active-eliminate',
+                colorVar: 'var(--sys-gray)',
+                icon: `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`
+            }
+        ];
+
+        const VALID_QUADRANT_IDS = new Set(QUADRANTS.map(q => q.id));
+
+        const MOTIVATIONAL_TOASTS = [
+            'Stark gemacht! Ein Punkt weniger auf der Liste.',
+            'Super Fortschritt – weiter so!',
+            'Abgehakt! Fokus zahlt sich aus.',
+            'Klasse erledigt! Du kommst richtig voran.',
+            'Wunderbar! Wieder einen Schritt weiter.'
+        ];
+
+        // --- Anwendungszustand ---
+        let state = {
+            tasks: [],
+            theme: 'apple-light', // 'apple-light' | 'apple-dark'
+            filter: 'all',        // 'all' | 'open' | 'completed'
+            search: '',
+            exportTab: 'markdown',
+            emailAuthMode: 'login',
+            draggedTaskId: null,
+            expandedQuickAdd: {}
+        };
+
+        // --- Hilfsfunktionen ---
+
+        function generateId() {
+            return 'task_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+        }
+
+        function getDateOffset(days = 0) {
+            const d = new Date();
+            d.setDate(d.getDate() + days);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDueDate(dateStr, isCompleted) {
+            if (!dateStr) return null;
+            const todayStr = getDateOffset(0);
+            const tomorrowStr = getDateOffset(1);
+
+            const parts = dateStr.split('-').map(Number);
+            if (parts.length !== 3 || parts.some(isNaN)) return null;
+            const [y, m, d] = parts;
+            const dateObj = new Date(y, m - 1, d);
+            const formatted = dateObj.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
+
+            if (isCompleted) {
+                return { label: formatted, style: 'background: var(--surface-subtle); color: var(--text-tertiary);' };
+            }
+            if (dateStr < todayStr) {
+                return { label: `Überfällig (${formatted})`, style: 'background: var(--sys-red-soft); color: var(--sys-red); font-weight: 600;' };
+            }
+            if (dateStr === todayStr) {
+                return { label: 'Heute', style: 'background: var(--sys-orange-soft); color: var(--sys-orange); font-weight: 600;' };
+            }
+            if (dateStr === tomorrowStr) {
+                return { label: 'Morgen', style: 'background: var(--sys-blue-soft); color: var(--sys-blue); font-weight: 500;' };
+            }
+            return { label: formatted, style: 'background: var(--surface-subtle); color: var(--text-secondary);' };
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // --- Theme-System (Ausschließlich Apple Hell & Apple Dunkel + Abwärtskompatibilität) ---
+
+        function normalizeTheme(raw) {
+            if (raw === 'apple-dark' || raw === 'dark') return 'apple-dark';
+            if (raw === 'apple-light' || raw === 'light' || raw === 'apple') return 'apple-light';
+            return 'apple-light';
+        }
+
+        function applyTheme(rawTheme, persistToCloud = false) {
+            const theme = normalizeTheme(rawTheme);
+            state.theme = theme;
+
+            document.documentElement.setAttribute('data-theme', theme);
+
+            // Browser & iOS Statusleisten-Farbe dynamisch anpassen
+            const metaThemeColor = document.getElementById('meta-theme-color');
+            if (metaThemeColor) {
+                metaThemeColor.setAttribute('content', theme === 'apple-dark' ? '#000000' : '#F5F5F7');
+            }
+
+            try {
+                window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+            } catch (e) {
+                // Ignorieren, falls localStorage blockiert ist
+            }
+
+            updateThemeSwitcherUI();
+
+            if (persistToCloud && currentUser && db) {
+                saveMatrixToCloud();
+            }
+        }
+
+        function initTheme() {
+            let saved = null;
+            try {
+                saved = window.localStorage.getItem(THEME_STORAGE_KEY);
+            } catch (e) {
+                saved = null;
+            }
+            if (saved) {
+                applyTheme(saved, false);
+            } else {
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyTheme(prefersDark ? 'apple-dark' : 'apple-light', false);
+            }
+        }
+
+        function updateThemeSwitcherUI() {
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.toggle('is-active', btn.dataset.themeChoice === state.theme);
+            });
+        }
+
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                applyTheme(btn.dataset.themeChoice, true);
+            });
+        });
+
+        // --- Lokaler Offline-Fallback ---
+
+        function saveLocalFallback() {
+            try {
+                window.localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(state.tasks));
+            } catch (e) {
+                // Ignorieren
+            }
+        }
+
+        function loadLocalFallback() {
+            try {
+                const raw = window.localStorage.getItem(LOCAL_CACHE_KEY);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // --- Cloud-Sync Status-Badge ---
+
+        function setSyncStatus(mode, customLabel = null) {
+            const dot = document.getElementById('sync-status-dot');
+            const text = document.getElementById('sync-status-text');
+            const badge = document.getElementById('sync-status-badge');
+            if (!dot || !text || !badge) return;
+
+            if (!navigator.onLine) mode = 'offline';
+
+            badge.classList.remove('sync-pill-synced', 'sync-pill-syncing', 'sync-pill-offline');
+
+            if (mode === 'synced') {
+                badge.classList.add('sync-pill-synced');
+                dot.className = 'w-2 h-2 rounded-full bg-current';
+                text.textContent = customLabel || 'Cloud-Sync aktiv';
+            } else if (mode === 'syncing') {
+                badge.classList.add('sync-pill-syncing');
+                dot.className = 'w-2 h-2 rounded-full bg-current animate-pulse';
+                text.textContent = customLabel || 'Synchronisiere...';
+            } else {
+                badge.classList.add('sync-pill-offline');
+                dot.className = 'w-2 h-2 rounded-full bg-current';
+                text.textContent = customLabel || 'Offline';
+            }
+        }
+
+        window.addEventListener('online', () => {
+            setSyncStatus(currentUser ? 'synced' : 'syncing');
+            showToast('Verbindung wiederhergestellt – Cloud-Sync aktiv.', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            setSyncStatus('offline');
+            showToast('Offline – Änderungen werden synchronisiert, sobald du wieder online bist.');
+        });
+
+        // --- Firestore Datenpfad: artifacts/{appId}/users/{userId}/eisenhower/state ---
+
+        function getUserStateDoc(uid) {
+            return doc(db, 'artifacts', appId, 'users', uid, 'eisenhower', 'state');
+        }
+
+        function getLegacyMatrixDoc(uid) {
+            return doc(db, 'artifacts', appId, 'users', uid, 'data', 'matrix');
+        }
+
+        function sanitizeTasks(rawList) {
+            if (!Array.isArray(rawList)) return [];
+            return rawList
+                .filter(t => t && typeof t.title === 'string' && t.title.trim().length > 0)
+                .map(t => ({
+                    id: t.id || generateId(),
+                    quadrant: VALID_QUADRANT_IDS.has(t.quadrant) ? t.quadrant : 'do',
+                    title: t.title.trim().slice(0, 140),
+                    note: typeof t.note === 'string' ? t.note.trim().slice(0, 500) : '',
+                    dueDate: typeof t.dueDate === 'string' ? t.dueDate : '',
+                    completed: Boolean(t.completed),
+                    createdAt: typeof t.createdAt === 'number' ? t.createdAt : Date.now()
+                }));
+        }
+
+        function createDefaultTasks() {
+            return [
+                {
+                    id: generateId(),
+                    quadrant: 'do',
+                    title: 'Projektpräsentation für morgen finalisieren',
+                    note: 'Zahlen auf Folie 4 prüfen und Fazit schärfen.',
+                    dueDate: getDateOffset(0),
+                    completed: false,
+                    createdAt: Date.now() - 40000
+                },
+                {
+                    id: generateId(),
+                    quadrant: 'do',
+                    title: 'Wichtige Kundenrückfrage beantworten',
+                    note: 'Angebot per E-Mail bestätigen.',
+                    dueDate: getDateOffset(0),
+                    completed: false,
+                    createdAt: Date.now() - 35000
+                },
+                {
+                    id: generateId(),
+                    quadrant: 'schedule',
+                    title: 'Quartalsziele & Meilensteine planen',
+                    note: '60 Minuten Fokuszeit im Kalender blocken.',
+                    dueDate: getDateOffset(4),
+                    completed: false,
+                    createdAt: Date.now() - 30000
+                },
+                {
+                    id: generateId(),
+                    quadrant: 'schedule',
+                    title: 'Sport-Routine für diese Woche festlegen',
+                    note: 'Dienstag und Donnerstag jeweils 45 Min.',
+                    dueDate: getDateOffset(2),
+                    completed: true,
+                    createdAt: Date.now() - 25000
+                },
+                {
+                    id: generateId(),
+                    quadrant: 'delegate',
+                    title: 'Terminabstimmung für das Team-Meeting',
+                    note: 'Umfrage im Chat starten oder abgeben.',
+                    dueDate: getDateOffset(1),
+                    completed: false,
+                    createdAt: Date.now() - 20000
+                },
+                {
+                    id: generateId(),
+                    quadrant: 'eliminate',
+                    title: 'Unnötige Newsletter abbestellen',
+                    note: 'Postfach von Ablenkungen befreien.',
+                    dueDate: '',
+                    completed: false,
+                    createdAt: Date.now() - 15000
+                }
+            ];
+        }
+
+        async function saveMatrixToCloud() {
+            saveLocalFallback();
+            if (!currentUser || !db) return;
+            try {
+                setSyncStatus('syncing');
+                await setDoc(getUserStateDoc(currentUser.uid), {
+                    tasks: state.tasks,
+                    theme: state.theme,
+                    updatedAt: Date.now()
+                }, { merge: true });
+                setSyncStatus('synced');
+            } catch (err) {
+                console.error('Fehler beim Speichern in Firestore:', err);
+                setSyncStatus('offline', 'Sync-Fehler');
+                showToast('Änderungen wurden lokal gesichert (Cloud-Sync pausiert).', 'error');
+            }
+        }
+
+        function attachRealtimeListener(user) {
+            detachRealtimeListener();
+            if (!user || !db) return;
+
+            setSyncStatus('syncing');
+            const stateRef = getUserStateDoc(user.uid);
+
+            unsubscribeMatrix = onSnapshot(
+                stateRef,
+                async (docSnap) => {
+                    if (!docSnap.exists()) {
+                        // Prüfen, ob aus einer früheren Version noch Daten unter data/matrix liegen
+                        let migrated = false;
+                        try {
+                            const legacySnap = await getDoc(getLegacyMatrixDoc(user.uid));
+                            if (legacySnap.exists()) {
+                                const legacyData = legacySnap.data();
+                                if (Array.isArray(legacyData.tasks)) {
+                                    state.tasks = sanitizeTasks(legacyData.tasks);
+                                    migrated = true;
+                                }
+                                if (legacyData.theme) {
+                                    applyTheme(legacyData.theme, false);
+                                }
+                            }
+                        } catch (e) {
+                            // Ignorieren, falls kein altes Dokument vorhanden
+                        }
+
+                        if (!migrated) {
+                            state.tasks = createDefaultTasks();
+                        }
+                        await saveMatrixToCloud();
+                        renderAll();
+                        return;
+                    }
+
+                    const data = docSnap.data();
+                    state.tasks = sanitizeTasks(data.tasks);
+                    saveLocalFallback();
+
+                    if (data.theme) {
+                        const mapped = normalizeTheme(data.theme);
+                        if (mapped !== state.theme) {
+                            applyTheme(mapped, false);
+                        }
+                    }
+
+                    setSyncStatus('synced');
+                    renderAll();
+                },
+                (error) => {
+                    console.error('Firestore Echtzeit-Sync Fehler:', error);
+                    setSyncStatus('offline', 'Sync-Fehler');
+                    const cached = loadLocalFallback();
+                    if (cached && state.tasks.length === 0) {
+                        state.tasks = sanitizeTasks(cached);
+                        renderAll();
+                    }
+                    showToast('Fehler bei der Cloud-Synchronisation.', 'error');
+                }
+            );
+        }
+
+        function detachRealtimeListener() {
+            if (unsubscribeMatrix) {
+                unsubscribeMatrix();
+                unsubscribeMatrix = null;
+            }
+        }
+
+        // --- Konfetti-Animation (Apple Systemfarben) ---
+
+        const confettiEngine = (() => {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animId = null;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            function burst(x, y) {
+                const colors = ['#007AFF', '#34C759', '#FF3B30', '#FF9500', '#AF52DE', '#5AC8FA'];
+                const count = 28;
+                for (let i = 0; i < count; i++) {
+                    const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+                    const speed = 2.5 + Math.random() * 5.5;
+                    particles.push({
+                        x, y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - 2.5,
+                        size: 4 + Math.random() * 4,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        rotation: Math.random() * 360,
+                        vRot: (Math.random() - 0.5) * 14,
+                        alpha: 1,
+                        decay: 0.018 + Math.random() * 0.015
+                    });
+                }
+                if (!animId) loop();
+            }
+
+            function loop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.18;
+                    p.vx *= 0.985;
+                    p.rotation += p.vRot;
+                    p.alpha -= p.decay;
+
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.save();
+                    ctx.globalAlpha = p.alpha;
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 3, p.size, p.size * 0.65);
+                    ctx.restore();
+                }
+
+                if (particles.length > 0) {
+                    animId = requestAnimationFrame(loop);
+                } else {
+                    animId = null;
+                }
+            }
+
+            return { burst };
+        })();
+
+        // --- Toast-Benachrichtigungen ---
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            let bgStyle = 'background: var(--modal-glass); color: var(--text-primary); border: 1px solid var(--border-strong); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);';
+            if (type === 'success') {
+                bgStyle = 'background: var(--sys-green); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.2);';
+            } else if (type === 'error') {
+                bgStyle = 'background: var(--sys-red); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.2);';
+            }
+
+            toast.setAttribute('style', bgStyle);
+            toast.className = 'pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-lg text-sm font-medium transform transition-all duration-300 translate-y-2 opacity-0';
+            toast.innerHTML = `<span class="flex-1">${escapeHtml(message)}</span>`;
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- Aufgaben-Logik (CRUD) ---
+
+        async function addTask(quadrantId, title, note = '', dueDate = '') {
+            const cleanTitle = title.trim();
+            if (!cleanTitle) return;
+
+            state.tasks.unshift({
+                id: generateId(),
+                quadrant: quadrantId,
+                title: cleanTitle,
+                note: note.trim(),
+                dueDate: dueDate || '',
+                completed: false,
+                createdAt: Date.now()
+            });
+
+            renderAll();
+            await saveMatrixToCloud();
+        }
+
+        async function updateTask(id, updates) {
+            const idx = state.tasks.findIndex(t => t.id === id);
+            if (idx === -1) return;
+            state.tasks[idx] = { ...state.tasks[idx], ...updates };
+            renderAll();
+            await saveMatrixToCloud();
+        }
+
+        async function deleteTask(id) {
+            state.tasks = state.tasks.filter(t => t.id !== id);
+            renderAll();
+            await saveMatrixToCloud();
+            showToast('Aufgabe gelöscht.');
+        }
+
+        async function toggleTaskCompleted(id, event) {
+            const task = state.tasks.find(t => t.id === id);
+            if (!task) return;
+
+            const nextCompleted = !task.completed;
+            if (nextCompleted) {
+                const rect = event && event.currentTarget ? event.currentTarget.getBoundingClientRect() : null;
+                const x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+                const y = rect ? rect.top + rect.height / 2 : window.innerHeight / 3;
+                confettiEngine.burst(x, y);
+
+                const msg = MOTIVATIONAL_TOASTS[Math.floor(Math.random() * MOTIVATIONAL_TOASTS.length)];
+                showToast(msg, 'success');
+            }
+
+            await updateTask(id, { completed: nextCompleted });
+        }
+
+        async function moveTaskToQuadrant(taskId, targetQuadrantId) {
+            const task = state.tasks.find(t => t.id === taskId);
+            if (!task || task.quadrant === targetQuadrantId) return;
+
+            await updateTask(taskId, { quadrant: targetQuadrantId });
+            const targetQ = QUADRANTS.find(q => q.id === targetQuadrantId);
+            if (targetQ) showToast(`Verschoben nach „${targetQ.title}“`);
+        }
+
+        async function clearCompletedTasks() {
+            const completedCount = state.tasks.filter(t => t.completed).length;
+            if (completedCount === 0) return;
+
+            state.tasks = state.tasks.filter(t => !t.completed);
+            renderAll();
+            await saveMatrixToCloud();
+            showToast(`${completedCount} erledigte ${completedCount === 1 ? 'Aufgabe' : 'Aufgaben'} bereinigt.`, 'success');
+        }
+
+        // --- Filterung & Sortierung ---
+
+        function getFilteredTasksForQuadrant(quadrantId) {
+            const query = state.search.trim().toLowerCase();
+
+            return state.tasks
+                .filter(task => {
+                    if (task.quadrant !== quadrantId) return false;
+                    if (state.filter === 'open' && task.completed) return false;
+                    if (state.filter === 'completed' && !task.completed) return false;
+                    if (query) {
+                        const inTitle = task.title.toLowerCase().includes(query);
+                        const inNote = (task.note || '').toLowerCase().includes(query);
+                        if (!inTitle && !inNote) return false;
+                    }
+                    return true;
+                })
+                .sort((a, b) => {
+                    if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                    return (b.createdAt || 0) - (a.createdAt || 0);
+                });
+        }
+
+        // --- Rendering ---
+
+        function renderHeaderStats() {
+            const total = state.tasks.length;
+            const completed = state.tasks.filter(t => t.completed).length;
+            const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+            document.getElementById('progress-stats').textContent = `${completed} / ${total} erledigt (${percent} %)`;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+
+            const motivationEl = document.getElementById('progress-motivation');
+            if (total === 0) {
+                motivationEl.textContent = 'Starte mit deiner ersten Aufgabe!';
+            } else if (percent === 100) {
+                motivationEl.textContent = 'Alles erledigt – großartige Arbeit! 🎉';
+            } else if (percent >= 70) {
+                motivationEl.textContent = 'Endspurt! Du hast fast alles geschafft.';
+            } else if (percent >= 35) {
+                motivationEl.textContent = 'Starker Rhythmus – bleib dran!';
+            } else if (completed > 0) {
+                motivationEl.textContent = 'Guter Start! Schritt für Schritt zum Ziel.';
+            } else {
+                motivationEl.textContent = 'Fokus auf Q1 & Q2 – du schaffst das!';
+            }
+
+            document.getElementById('btn-clear-completed').disabled = completed === 0;
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('is-active', btn.dataset.filter === state.filter);
+            });
+        }
+
+        function renderMatrix() {
+            const grid = document.getElementById('matrix-grid');
+            grid.innerHTML = '';
+
+            QUADRANTS.forEach(q => {
+                const visibleTasks = getFilteredTasksForQuadrant(q.id);
+                const totalInQ = state.tasks.filter(t => t.quadrant === q.id).length;
+                const openInQ = state.tasks.filter(t => t.quadrant === q.id && !t.completed).length;
+                const isExpanded = !!state.expandedQuickAdd[q.id];
+
+                const section = document.createElement('section');
+                section.dataset.quadrant = q.id;
+                section.className = 'quadrant-card flex flex-col min-h-[340px]';
+
+                section.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    section.classList.add(q.dropClass);
+                });
+
+                section.addEventListener('dragleave', (e) => {
+                    if (!section.contains(e.relatedTarget)) {
+                        section.classList.remove(q.dropClass);
+                    }
+                });
+
+                section.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    section.classList.remove(q.dropClass);
+                    const taskId = e.dataTransfer.getData('text/plain') || state.draggedTaskId;
+                    if (taskId) moveTaskToQuadrant(taskId, q.id);
+                    state.draggedTaskId = null;
+                });
+
+                const headerHtml = `
+                    <div class="p-4 sm:p-5 pb-3 flex items-start justify-between gap-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-2xl ${q.badgeClass} flex items-center justify-center shrink-0 mt-0.5">
+                                ${q.icon}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h2 class="text-base font-bold text-apple-primary leading-snug">
+                                        ${q.title}
+                                    </h2>
+                                    <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${q.badgeClass}">
+                                        ${q.code}
+                                    </span>
+                                </div>
+                                <p class="text-xs font-medium text-apple-secondary mt-0.5">
+                                    ${q.subtitle}
+                                </p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-medium px-2.5 py-1 rounded-full text-apple-secondary shrink-0 tabular-nums"
+                            style="background: var(--surface-subtle);" title="Offen / Gesamt">
+                            ${openInQ} offen${totalInQ !== openInQ ? ` · ${totalInQ}` : ''}
+                        </span>
+                    </div>
+                `;
+
+                const quickAddHtml = `
+                    <form class="quick-add-form px-4 sm:px-5 pb-3" data-quadrant="${q.id}">
+                        <div class="flex items-center gap-2">
+                            <input type="text" name="title" placeholder="${q.placeholder}" maxlength="140" autocomplete="off"
+                                class="apple-input flex-1 px-3.5 py-2 text-sm">
+                            <button type="button" class="toggle-extra-btn apple-pill-btn p-2 text-apple-secondary"
+                                title="Notiz &amp; Datum hinzufügen" aria-label="Optionale Felder ein- oder ausblenden" aria-expanded="${isExpanded}">
+                                <svg class="w-4 h-4 transition-transform ${isExpanded ? 'rotate-45' : ''}" style="${isExpanded ? 'color: var(--sys-blue);' : ''}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </button>
+                            <button type="submit"
+                                class="${q.btnClass} px-4 py-2 text-xs sm:text-sm font-semibold transition-all shadow-sm shrink-0">
+                                Hinzufügen
+                            </button>
+                        </div>
+                        <div class="extra-fields ${isExpanded ? 'grid' : 'hidden'} grid-cols-1 sm:grid-cols-3 gap-2 mt-2">
+                            <input type="text" name="note" placeholder="Kurze Notiz (optional)" maxlength="500"
+                                class="apple-input sm:col-span-2 px-3 py-1.5 text-xs">
+                            <input type="date" name="dueDate" aria-label="Fälligkeitsdatum"
+                                class="apple-input px-3 py-1.5 text-xs">
+                        </div>
+                    </form>
+                `;
+
+                section.innerHTML = headerHtml + quickAddHtml;
+
+                const listContainer = document.createElement('div');
+                listContainer.className = 'flex-1 px-4 sm:px-5 pb-4 sm:pb-5 space-y-2.5 overflow-y-auto';
+
+                if (visibleTasks.length === 0) {
+                    const emptyMsg = state.search.trim()
+                        ? 'Keine passenden Aufgaben gefunden.'
+                        : state.filter === 'completed'
+                            ? 'Noch keine erledigten Aufgaben hier.'
+                            : 'Keine Aufgaben in diesem Quadranten.';
+                    listContainer.innerHTML = `
+                        <div class="apple-empty-box h-full min-h-[120px] flex flex-col items-center justify-center text-center p-4">
+                            <p class="text-xs sm:text-sm">${emptyMsg}</p>
+                        </div>
+                    `;
+                } else {
+                    visibleTasks.forEach(task => {
+                        listContainer.appendChild(createTaskElement(task, q));
+                    });
+                }
+
+                section.appendChild(listContainer);
+
+                const form = section.querySelector('.quick-add-form');
+                const toggleExtraBtn = form.querySelector('.toggle-extra-btn');
+                const extraFields = form.querySelector('.extra-fields');
+
+                toggleExtraBtn.addEventListener('click', () => {
+                    const nowHidden = extraFields.classList.toggle('hidden');
+                    extraFields.classList.toggle('grid', !nowHidden);
+                    state.expandedQuickAdd[q.id] = !nowHidden;
+                    const svg = toggleExtraBtn.querySelector('svg');
+                    svg.classList.toggle('rotate-45', !nowHidden);
+                    svg.style.color = !nowHidden ? 'var(--sys-blue)' : '';
+                    toggleExtraBtn.setAttribute('aria-expanded', String(!nowHidden));
+                });
+
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const titleInput = form.elements['title'];
+                    const noteInput = form.elements['note'];
+                    const dateInput = form.elements['dueDate'];
+                    if (!titleInput.value.trim()) {
+                        titleInput.focus();
+                        return;
+                    }
+                    const tVal = titleInput.value;
+                    const nVal = noteInput.value;
+                    const dVal = dateInput.value;
+                    titleInput.value = '';
+                    noteInput.value = '';
+                    dateInput.value = '';
+                    await addTask(q.id, tVal, nVal, dVal);
+                    const newInput = document.querySelector(`.quick-add-form[data-quadrant="${q.id}"] input[name="title"]`);
+                    if (newInput) newInput.focus();
+                });
+
+                grid.appendChild(section);
+            });
+        }
+
+        function createTaskElement(task, quadrant) {
+            const card = document.createElement('article');
+            card.draggable = true;
+            card.dataset.taskId = task.id;
+            card.className = `task-card group relative flex items-start gap-3 p-3.5 cursor-grab active:cursor-grabbing ${task.completed ? 'is-completed' : ''}`;
+
+            card.addEventListener('dragstart', (e) => {
+                state.draggedTaskId = task.id;
+                e.dataTransfer.setData('text/plain', task.id);
+                e.dataTransfer.effectAllowed = 'move';
+                requestAnimationFrame(() => card.classList.add('opacity-40', 'scale-[0.98]'));
+            });
+
+            card.addEventListener('dragend', () => {
+                state.draggedTaskId = null;
+                card.classList.remove('opacity-40', 'scale-[0.98]');
+                document.querySelectorAll('.quadrant-card').forEach(el => {
+                    const qObj = QUADRANTS.find(item => item.id === el.dataset.quadrant);
+                    if (qObj) el.classList.remove(qObj.dropClass);
+                });
+            });
+
+            // Runde Apple-Erinnerungen-Checkbox
+            const checkBtn = document.createElement('button');
+            checkBtn.type = 'button';
+            checkBtn.setAttribute('aria-label', task.completed ? 'Als offen markieren' : 'Als erledigt markieren');
+            checkBtn.className = 'mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all';
+            if (task.completed) {
+                checkBtn.style.background = quadrant.colorVar;
+                checkBtn.style.borderColor = quadrant.colorVar;
+                checkBtn.style.color = '#FFFFFF';
+                checkBtn.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            } else {
+                checkBtn.style.borderColor = 'var(--border-strong)';
+                checkBtn.style.background = 'transparent';
+            }
+            checkBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleTaskCompleted(task.id, e);
+            });
+
+            const content = document.createElement('div');
+            content.className = 'flex-1 min-w-0 cursor-pointer';
+            content.addEventListener('click', () => openEditModal(task.id));
+
+            const dueInfo = formatDueDate(task.dueDate, task.completed);
+            const dueBadgeHtml = dueInfo
+                ? `<span class="inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full" style="${dueInfo.style}">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        ${escapeHtml(dueInfo.label)}
+                   </span>`
+                : '';
+
+            content.innerHTML = `
+                <p class="text-sm font-medium leading-snug break-words ${task.completed ? 'line-through text-apple-tertiary' : 'text-apple-primary'}">
+                    ${escapeHtml(task.title)}
+                </p>
+                ${task.note ? `
+                    <p class="text-xs text-apple-secondary mt-1 line-clamp-2 break-words">
+                        ${escapeHtml(task.note)}
+                    </p>
+                ` : ''}
+                ${dueBadgeHtml ? `<div class="mt-2 flex items-center gap-2 flex-wrap">${dueBadgeHtml}</div>` : ''}
+            `;
+
+            const actions = document.createElement('div');
+            actions.className = 'flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-opacity shrink-0';
+
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.title = 'Bearbeiten';
+            editBtn.setAttribute('aria-label', 'Aufgabe bearbeiten');
+            editBtn.className = 'p-1.5 rounded-full text-apple-tertiary hover:text-apple-primary transition-colors';
+            editBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openEditModal(task.id);
+            });
+
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.title = 'Löschen';
+            delBtn.setAttribute('aria-label', 'Aufgabe löschen');
+            delBtn.className = 'p-1.5 rounded-full text-apple-tertiary transition-colors';
+            delBtn.addEventListener('mouseenter', () => { delBtn.style.color = 'var(--sys-red)'; });
+            delBtn.addEventListener('mouseleave', () => { delBtn.style.color = ''; });
+            delBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>`;
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteTask(task.id);
+            });
+
+            actions.appendChild(editBtn);
+            actions.appendChild(delBtn);
+
+            card.appendChild(checkBtn);
+            card.appendChild(content);
+            card.appendChild(actions);
+
+            return card;
+        }
+
+        function renderAll() {
+            renderHeaderStats();
+            renderMatrix();
+        }
+
+        // --- Account-UI & Authentifizierung (iOS Safari freundlich) ---
+
+        const accountModal = document.getElementById('account-modal');
+        const accountFeedback = document.getElementById('account-feedback');
+        const emailTabLogin = document.getElementById('email-tab-login');
+        const emailTabRegister = document.getElementById('email-tab-register');
+        const btnEmailSubmit = document.getElementById('btn-email-submit');
+
+        function updateEmailAuthTabs() {
+            emailTabLogin.classList.toggle('is-active', state.emailAuthMode === 'login');
+            emailTabRegister.classList.toggle('is-active', state.emailAuthMode === 'register');
+            btnEmailSubmit.textContent = state.emailAuthMode === 'login'
+                ? 'Mit E-Mail anmelden'
+                : 'Konto erstellen & verknüpfen';
+        }
+
+        emailTabLogin.addEventListener('click', () => {
+            state.emailAuthMode = 'login';
+            clearAccountFeedback();
+            updateEmailAuthTabs();
+        });
+
+        emailTabRegister.addEventListener('click', () => {
+            state.emailAuthMode = 'register';
+            clearAccountFeedback();
+            updateEmailAuthTabs();
+        });
+
+        function showAccountFeedback(msg, isError = false) {
+            accountFeedback.textContent = msg;
+            accountFeedback.setAttribute('style', isError
+                ? 'background: var(--sys-red-soft); color: var(--sys-red); border: 1px solid var(--sys-red-soft);'
+                : 'background: var(--sys-green-soft); color: var(--sys-green); border: 1px solid var(--sys-green-soft);');
+            accountFeedback.classList.remove('hidden');
+        }
+
+        function clearAccountFeedback() {
+            accountFeedback.classList.add('hidden');
+        }
+
+        function updateAccountUI(user) {
+            const btnLabel = document.getElementById('account-btn-label');
+            const statusPill = document.getElementById('account-status-pill');
+            const emailDisplay = document.getElementById('account-email-display');
+            const uidDisplay = document.getElementById('account-uid-display');
+            const guestActions = document.getElementById('account-guest-actions');
+            const signedInActions = document.getElementById('account-signedin-actions');
+
+            if (!user) {
+                btnLabel.textContent = 'Anmelden';
+                statusPill.textContent = 'Nicht verbunden';
+                statusPill.setAttribute('style', 'background: var(--surface-subtle); color: var(--text-secondary);');
+                emailDisplay.textContent = 'Keine aktive Sitzung';
+                uidDisplay.textContent = '–';
+                guestActions.classList.remove('hidden');
+                signedInActions.classList.add('hidden');
+                return;
+            }
+
+            uidDisplay.textContent = user.uid;
+
+            if (user.isAnonymous) {
+                btnLabel.textContent = 'Gast-Konto';
+                statusPill.textContent = 'Gast-Konto';
+                statusPill.setAttribute('style', 'background: var(--sys-orange-soft); color: var(--sys-orange);');
+                emailDisplay.textContent = 'Anonym angemeldet (Cloud-Sync aktiv)';
+                guestActions.classList.remove('hidden');
+                signedInActions.classList.add('hidden');
+            } else {
+                const displayName = user.displayName || user.email || 'Angemeldet';
+                btnLabel.textContent = displayName;
+                statusPill.textContent = 'Verknüpft';
+                statusPill.setAttribute('style', 'background: var(--sys-green-soft); color: var(--sys-green);');
+                emailDisplay.textContent = user.email ? (user.displayName ? `${user.displayName} (${user.email})` : user.email) : displayName;
+                guestActions.classList.add('hidden');
+                signedInActions.classList.remove('hidden');
+            }
+        }
+
+        function translateAuthError(error) {
+            const code = error && error.code ? error.code : '';
+            const map = {
+                'auth/email-already-in-use': 'Diese E-Mail-Adresse ist bereits registriert. Bitte wechsle auf „Anmelden“.',
+                'auth/credential-already-in-use': 'Dieses Google-Konto existiert bereits. Bitte nutze oben „Mit bestehendem Google-Konto anmelden“.',
+                'auth/invalid-email': 'Bitte gib eine gültige E-Mail-Adresse ein.',
+                'auth/weak-password': 'Das Passwort muss mindestens 6 Zeichen lang sein.',
+                'auth/wrong-password': 'Das eingegebene Passwort ist nicht korrekt.',
+                'auth/invalid-credential': 'E-Mail oder Passwort sind nicht korrekt.',
+                'auth/user-not-found': 'Es wurde kein Konto mit dieser E-Mail-Adresse gefunden.',
+                'auth/popup-closed-by-user': 'Das Anmeldefenster wurde vorzeitig geschlossen.',
+                'auth/popup-blocked': 'Dein Browser hat das Anmeldefenster blockiert. Bitte erlaube Pop-ups kurz in den Einstellungen.',
+                'auth/operation-not-allowed': 'Diese Anmeldemethode ist im Firebase-Projekt nicht aktiviert.',
+                'auth/unauthorized-domain': 'Diese Domain ist in der Firebase-Konsole noch nicht für Google-Login freigegeben.'
+            };
+            return map[code] || 'Anmeldung fehlgeschlagen. Bitte versuche es erneut.';
+        }
+
+        function openAccountModal() {
+            clearAccountFeedback();
+            updateEmailAuthTabs();
+            updateAccountUI(currentUser);
+            accountModal.classList.remove('hidden');
+            accountModal.classList.add('flex');
+        }
+
+        function closeAccountModal() {
+            accountModal.classList.add('hidden');
+            accountModal.classList.remove('flex');
+        }
+
+        document.getElementById('btn-open-account').addEventListener('click', openAccountModal);
+        document.getElementById('account-modal-close').addEventListener('click', closeAccountModal);
+        accountModal.addEventListener('click', (e) => {
+            if (e.target === accountModal) closeAccountModal();
+        });
+
+        // 1. Direkt mit bestehendem Google-Konto anmelden (1 direkter Popup-Aufruf -> iOS Safari freundlich)
+        document.getElementById('btn-google-signin').addEventListener('click', async () => {
+            if (!auth) return;
+            clearAccountFeedback();
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                showToast('Mit Google angemeldet!', 'success');
+                closeAccountModal();
+            } catch (err) {
+                console.error('Google Sign-In Fehler:', err);
+                showAccountFeedback(translateAuthError(err), true);
+            }
+        });
+
+        // 2. Gast-Konto explizit mit Google verknüpfen
+        document.getElementById('btn-google-link').addEventListener('click', async () => {
+            if (!auth || !currentUser) return;
+            clearAccountFeedback();
+            const provider = new GoogleAuthProvider();
+            try {
+                await linkWithPopup(currentUser, provider);
+                showToast('Gast-Konto erfolgreich mit Google verknüpft!', 'success');
+                closeAccountModal();
+            } catch (err) {
+                console.error('Google Link Fehler:', err);
+                showAccountFeedback(translateAuthError(err), true);
+            }
+        });
+
+        // E-Mail & Passwort Submit
+        document.getElementById('email-auth-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!auth) return;
+            clearAccountFeedback();
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+
+            if (!email || password.length < 6) {
+                showAccountFeedback('Bitte gib eine gültige E-Mail-Adresse und ein Passwort (mind. 6 Zeichen) ein.', true);
+                return;
+            }
+
+            try {
+                if (state.emailAuthMode === 'login') {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showToast('Erfolgreich angemeldet!', 'success');
+                    closeAccountModal();
+                } else {
+                    if (currentUser && currentUser.isAnonymous) {
+                        const cred = EmailAuthProvider.credential(email, password);
+                        await linkWithCredential(currentUser, cred);
+                        showToast('Konto erstellt & mit deinen Aufgaben verknüpft!', 'success');
+                        updateAccountUI(auth.currentUser);
+                        closeAccountModal();
+                    } else {
+                        await createUserWithEmailAndPassword(auth, email, password);
+                        showToast('Konto erfolgreich erstellt!', 'success');
+                        closeAccountModal();
+                    }
+                }
+            } catch (err) {
+                console.error('E-Mail Auth Fehler:', err);
+                showAccountFeedback(translateAuthError(err), true);
+            }
+        });
+
+        // Abmelden
+        document.getElementById('btn-sign-out').addEventListener('click', async () => {
+            if (!auth) return;
+            try {
+                detachRealtimeListener();
+                await signOut(auth);
+                await signInAnonymously(auth);
+                showToast('Abgemeldet. Du bist jetzt wieder im Gast-Modus.');
+                closeAccountModal();
+            } catch (err) {
+                console.error('Abmelden Fehler:', err);
+                showAccountFeedback('Abmelden fehlgeschlagen.', true);
+            }
+        });
+
+        // --- Modal: Aufgabe bearbeiten ---
+
+        const editModal = document.getElementById('edit-modal');
+        const editForm = document.getElementById('edit-task-form');
+
+        function openEditModal(taskId) {
+            const task = state.tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            document.getElementById('edit-task-id').value = task.id;
+            document.getElementById('edit-task-title').value = task.title;
+            document.getElementById('edit-task-note').value = task.note || '';
+            document.getElementById('edit-task-date').value = task.dueDate || '';
+            document.getElementById('edit-task-quadrant').value = task.quadrant;
+
+            editModal.classList.remove('hidden');
+            editModal.classList.add('flex');
+            document.getElementById('edit-task-title').focus();
+        }
+
+        function closeEditModal() {
+            editModal.classList.add('hidden');
+            editModal.classList.remove('flex');
+        }
+
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-task-id').value;
+            const title = document.getElementById('edit-task-title').value.trim();
+            if (!title) return;
+
+            closeEditModal();
+            await updateTask(id, {
+                title,
+                note: document.getElementById('edit-task-note').value.trim(),
+                dueDate: document.getElementById('edit-task-date').value,
+                quadrant: document.getElementById('edit-task-quadrant').value
+            });
+            showToast('Änderungen gespeichert.');
+        });
+
+        document.getElementById('edit-task-delete').addEventListener('click', async () => {
+            const id = document.getElementById('edit-task-id').value;
+            closeEditModal();
+            await deleteTask(id);
+        });
+
+        document.getElementById('edit-modal-close').addEventListener('click', closeEditModal);
+        document.getElementById('edit-task-cancel').addEventListener('click', closeEditModal);
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) closeEditModal();
+        });
+
+        // --- Modal: Exportieren & JSON Importieren ---
+
+        const exportModal = document.getElementById('export-modal');
+        const exportPreview = document.getElementById('export-preview');
+        const exportView = document.getElementById('export-view');
+        const importView = document.getElementById('import-view');
+        const exportTabMd = document.getElementById('export-tab-md');
+        const exportTabJson = document.getElementById('export-tab-json');
+        const exportTabImport = document.getElementById('export-tab-import');
+        const importTextarea = document.getElementById('import-textarea');
+        const importFileInput = document.getElementById('import-file-input');
+
+        function generateMarkdownExport() {
+            const lines = [
+                `# Eisenhower-Matrix (${new Date().toLocaleDateString('de-DE')})`,
+                ''
+            ];
+            QUADRANTS.forEach(q => {
+                lines.push(`## ${q.code}: ${q.title} (${q.subtitle})`);
+                const qTasks = state.tasks.filter(t => t.quadrant === q.id);
+                if (qTasks.length === 0) {
+                    lines.push('_Keine Aufgaben_');
+                } else {
+                    qTasks.forEach(t => {
+                        const box = t.completed ? '[x]' : '[ ]';
+                        const datePart = t.dueDate ? ` _(Fällig: ${t.dueDate})_` : '';
+                        lines.push(`- ${box} **${t.title}**${datePart}`);
+                        if (t.note) lines.push(`  - ${t.note}`);
+                    });
+                }
+                lines.push('');
+            });
+            return lines.join('\n');
+        }
+
+        function generateJsonExport() {
+            return JSON.stringify({
+                exportedAt: new Date().toISOString(),
+                tasks: state.tasks
+            }, null, 2);
+        }
+
+        function updateExportModalUI() {
+            exportTabMd.classList.toggle('is-active', state.exportTab === 'markdown');
+            exportTabJson.classList.toggle('is-active', state.exportTab === 'json');
+            exportTabImport.classList.toggle('is-active', state.exportTab === 'import');
+
+            if (state.exportTab === 'import') {
+                exportView.classList.add('hidden');
+                importView.classList.remove('hidden');
+            } else {
+                exportView.classList.remove('hidden');
+                importView.classList.add('hidden');
+                exportPreview.value = state.exportTab === 'markdown' ? generateMarkdownExport() : generateJsonExport();
+            }
+        }
+
+        function openExportModal() {
+            updateExportModalUI();
+            exportModal.classList.remove('hidden');
+            exportModal.classList.add('flex');
+        }
+
+        function closeExportModal() {
+            exportModal.classList.add('hidden');
+            exportModal.classList.remove('flex');
+        }
+
+        exportTabMd.addEventListener('click', () => { state.exportTab = 'markdown'; updateExportModalUI(); });
+        exportTabJson.addEventListener('click', () => { state.exportTab = 'json'; updateExportModalUI(); });
+        exportTabImport.addEventListener('click', () => { state.exportTab = 'import'; updateExportModalUI(); });
+
+        document.getElementById('btn-open-export').addEventListener('click', openExportModal);
+        document.getElementById('export-modal-close').addEventListener('click', closeExportModal);
+        exportModal.addEventListener('click', (e) => {
+            if (e.target === exportModal) closeExportModal();
+        });
+
+        document.getElementById('btn-copy-export').addEventListener('click', () => {
+            try {
+                exportPreview.select();
+                exportPreview.setSelectionRange(0, 99999);
+                const ok = document.execCommand('copy');
+                showToast(
+                    ok ? `${state.exportTab === 'markdown' ? 'Markdown' : 'JSON'} kopiert!` : 'Kopieren fehlgeschlagen.',
+                    ok ? 'success' : 'error'
+                );
+            } catch (err) {
+                showToast('Kopieren fehlgeschlagen.', 'error');
+            }
+        });
+
+        document.getElementById('btn-download-export').addEventListener('click', () => {
+            try {
+                const isMd = state.exportTab === 'markdown';
+                const blob = new Blob([exportPreview.value], { type: isMd ? 'text/markdown;charset=utf-8' : 'application/json;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `eisenhower-matrix-${getDateOffset(0)}.${isMd ? 'md' : 'json'}`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+                showToast('Datei wurde heruntergeladen.', 'success');
+            } catch (err) {
+                showToast('Download konnte nicht gestartet werden.', 'error');
+            }
+        });
+
+        importFileInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => { importTextarea.value = String(ev.target.result || ''); };
+            reader.onerror = () => { showToast('Datei konnte nicht gelesen werden.', 'error'); };
+            reader.readAsText(file);
+            importFileInput.value = '';
+        });
+
+        document.getElementById('btn-run-import').addEventListener('click', async () => {
+            const raw = importTextarea.value.trim();
+            if (!raw) {
+                showToast('Bitte füge zuerst JSON-Daten ein oder wähle eine Datei aus.', 'error');
+                return;
+            }
+            try {
+                const parsed = JSON.parse(raw);
+                const list = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.tasks) ? parsed.tasks : null);
+                if (!list || list.length === 0) {
+                    showToast('Keine gültigen Aufgaben im JSON gefunden.', 'error');
+                    return;
+                }
+                const validTasks = sanitizeTasks(list).map(item => ({ ...item, id: generateId() }));
+                if (validTasks.length === 0) {
+                    showToast('Keine gültigen Aufgaben mit Titel gefunden.', 'error');
+                    return;
+                }
+
+                state.tasks = [...validTasks, ...state.tasks];
+                renderAll();
+                await saveMatrixToCloud();
+
+                importTextarea.value = '';
+                closeExportModal();
+                showToast(`${validTasks.length} ${validTasks.length === 1 ? 'Aufgabe' : 'Aufgaben'} importiert!`, 'success');
+            } catch (err) {
+                showToast('Ungültiges JSON-Format. Bitte prüfe die Eingabe.', 'error');
+            }
+        });
+
+        // --- Modal: Bestätigung zum Bereinigen ---
+
+        const confirmModal = document.getElementById('confirm-modal');
+
+        function openConfirmModal() {
+            const count = state.tasks.filter(t => t.completed).length;
+            if (count === 0) return;
+            document.getElementById('confirm-modal-desc').textContent =
+                `${count} als erledigt markierte ${count === 1 ? 'Aufgabe wird' : 'Aufgaben werden'} dauerhaft entfernt.`;
+            confirmModal.classList.remove('hidden');
+            confirmModal.classList.add('flex');
+        }
+
+        function closeConfirmModal() {
+            confirmModal.classList.add('hidden');
+            confirmModal.classList.remove('flex');
+        }
+
+        document.getElementById('btn-clear-completed').addEventListener('click', openConfirmModal);
+        document.getElementById('confirm-cancel').addEventListener('click', closeConfirmModal);
+        document.getElementById('confirm-accept').addEventListener('click', async () => {
+            closeConfirmModal();
+            await clearCompletedTasks();
+        });
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) closeConfirmModal();
+        });
+
+        // --- Suche, Filter & Tastaturkürzel ---
+
+        const searchInput = document.getElementById('search-input');
+        const searchClear = document.getElementById('search-clear');
+
+        searchInput.addEventListener('input', (e) => {
+            state.search = e.target.value;
+            searchClear.classList.toggle('hidden', !state.search);
+            renderMatrix();
+        });
+
+        searchClear.addEventListener('click', () => {
+            state.search = '';
+            searchInput.value = '';
+            searchClear.classList.add('hidden');
+            renderMatrix();
+            searchInput.focus();
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                state.filter = btn.dataset.filter;
+                renderAll();
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeEditModal();
+                closeExportModal();
+                closeConfirmModal();
+                closeAccountModal();
+            }
+        });
+
+        // --- App-Start & Authentifizierung ---
+
+        async function bootstrapApp() {
+            initTheme();
+            updateEmailAuthTabs();
+
+            const cached = loadLocalFallback();
+            if (cached && cached.length > 0) {
+                state.tasks = sanitizeTasks(cached);
+            }
+            renderAll();
+
+            try {
+                setSyncStatus('syncing', 'Verbinde...');
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else if (!auth.currentUser) {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    updateAccountUI(user);
+
+                    if (user) {
+                        attachRealtimeListener(user);
+                    } else {
+                        detachRealtimeListener();
+                        state.tasks = [];
+                        renderAll();
+                        setSyncStatus('offline', 'Abgemeldet');
+                    }
+                });
+            } catch (err) {
+                console.error('Firebase-Initialisierung fehlgeschlagen:', err);
+                setSyncStatus('offline', 'Offline-Modus');
+                showToast('Cloud-Verbindung nicht erreichbar – lokaler Modus aktiv.', 'error');
+            }
+        }
+
+        bootstrapApp();
+    </script>
+</body>
+</html>
