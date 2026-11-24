@@ -1058,6 +1058,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import {
             getAuth,
+            setPersistence,
+            browserLocalPersistence,
             signInAnonymously,
             signInWithCustomToken,
             onAuthStateChanged,
@@ -2482,7 +2484,7 @@
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-
+                await setPersistence(auth, browserLocalPersistence);
                 await auth.authStateReady();
                 
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
