@@ -2483,6 +2483,8 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
+                await auth.authStateReady();
+                
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else if (!auth.currentUser) {
