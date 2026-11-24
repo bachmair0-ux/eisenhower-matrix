@@ -1390,6 +1390,12 @@
         <span id="account-label" class="hide-sm">Lokal</span>
       </button>
 
+      <!-- Sound An / Stumm Toggle -->
+      <button id="btn-sound" class="icon-btn icon-only" type="button" title="UI-Sounds stummschalten" aria-label="UI-Sounds ein- oder ausschalten">
+        <svg id="sound-icon-on" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        <svg id="sound-icon-off" class="hidden" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+      </button>
+
       <!-- Light / Dark Toggle -->
       <button id="btn-theme" class="icon-btn icon-only" type="button" title="Erscheinungsbild wechseln" aria-label="Erscheinungsbild wechseln">
         <svg id="theme-icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
@@ -1817,6 +1823,7 @@
       notifications: [],
       alertedMap: {}, // { taskId: 'warn' | 'critical' }
       theme: 'light',
+      soundEnabled: true,
       view: 'kanban', // 'kanban' | 'matrix'
       hideDoneInMatrix: false,
       search: '',
@@ -1853,6 +1860,7 @@
           state.notifications = Array.isArray(parsed.notifications) ? parsed.notifications : [];
           state.alertedMap = parsed.alertedMap || {};
           state.theme = parsed.theme === 'dark' ? 'dark' : 'light';
+          state.soundEnabled = parsed.soundEnabled !== false;
           state.view = parsed.view === 'matrix' ? 'matrix' : 'kanban';
           state.sortBy = parsed.sortBy || 'manual';
           state.hideDoneInMatrix = Boolean(parsed.hideDoneInMatrix);
@@ -1873,6 +1881,7 @@
         notifications: state.notifications.slice(0, 40),
         alertedMap: state.alertedMap,
         theme: state.theme,
+        soundEnabled: state.soundEnabled,
         view: state.view,
         sortBy: state.sortBy,
         hideDoneInMatrix: state.hideDoneInMatrix,
@@ -1904,6 +1913,65 @@
         console.warn('Cloud-Sync Fehler:', err);
         if (dot) dot.className = 'sync-dot';
       }
+    }
+
+    /* =========================================================================
+       APPLE-HIG WEB AUDIO API SOUND ENGINE (DEZENT & RUHIG)
+       ========================================================================= */
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return null;
+        audioCtx = new Ctx();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+      return audioCtx;
+    }
+
+    function playTone(ctx, { freq, endFreq = null, type = 'sine', start = 0, duration = 0.08, gain = 0.045 }) {
+      const now = ctx.currentTime + start;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+      if (endFreq !== null) {
+        osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+      }
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.linearRampToValueAtTime(gain, now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.connect(g);
+      g.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + duration + 0.015);
+    }
+
+    function playSound(kind) {
+      if (!state.soundEnabled) return;
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      try {
+        if (kind === 'subtask') {
+          // Weicher, kurzer Bestätigungs-Tick beim Abhaken einer Unteraufgabe
+          playTone(ctx, { freq: 587.33, endFreq: 783.99, type: 'sine', duration: 0.065, gain: 0.038 });
+        } else if (kind === 'done') {
+          // Ruhiger, warmer Apple-Zweiklang (C5 -> E5 -> sanfte Quinte G5)
+          playTone(ctx, { freq: 523.25, type: 'sine', start: 0, duration: 0.16, gain: 0.048 });
+          playTone(ctx, { freq: 659.25, type: 'sine', start: 0.065, duration: 0.22, gain: 0.048 });
+          playTone(ctx, { freq: 783.99, type: 'triangle', start: 0.12, duration: 0.26, gain: 0.022 });
+        } else if (kind === 'move') {
+          // Subtiles, taktiles Einrast-Geräusch für Drag & Drop
+          playTone(ctx, { freq: 260, endFreq: 175, type: 'sine', duration: 0.055, gain: 0.045 });
+        } else if (kind === 'alert') {
+          // Sanfter Doppel-Hinweis für kritische / überfällige Deadlines
+          playTone(ctx, { freq: 440, type: 'sine', start: 0, duration: 0.18, gain: 0.045 });
+          playTone(ctx, { freq: 392, type: 'sine', start: 0.17, duration: 0.24, gain: 0.04 });
+        }
+      } catch (_) {}
     }
 
     /* =========================================================================
@@ -2029,6 +2097,7 @@
         task.kanbanStatus = 'done';
         if (prevStatus !== 'done') {
           showToast(`„${task.title}“ abgeschlossen`, 'success');
+          playSound('done');
         }
       } else if (prevStatus === 'done' || wasFromDoneTrigger) {
         // Nacharbeit-Erkennung!
@@ -2055,6 +2124,7 @@
       const wasDone = task.kanbanStatus === 'done';
       st.completed = !st.completed;
       const pct = calcProgressFromSubtasks(task.subtasks);
+      if (st.completed && pct < 100) playSound('subtask');
       applyProgressChange(task, pct, wasDone && !st.completed);
       persistState();
       render();
@@ -2090,6 +2160,7 @@
         task.kanbanStatus = 'done';
         task.updatedAt = Date.now();
         showToast(`„${task.title}“ als Fertig markiert`, 'success');
+        playSound('done');
       }
       persistState();
       render();
@@ -2145,6 +2216,7 @@
         }
         checkReworkEscalation(task);
       }
+      playSound(targetStatus === 'done' ? 'done' : 'move');
       persistState();
       render();
     }
@@ -2155,6 +2227,7 @@
       task.eisenhowerQuadrant = targetQ;
       if (lockAfter) task.isQuadrantLocked = true;
       task.updatedAt = Date.now();
+      playSound('move');
       persistState();
       render();
     }
@@ -2251,6 +2324,7 @@
             changed = true;
             showToast(`${notif.title}: „${task.title}“`, 'critical');
             sendBrowserNotification(notif.title, task.title);
+            playSound('alert');
           }
         } else if (diff < H24) {
           if (!prevLevel) {
@@ -2443,6 +2517,7 @@
           const tmp = dragged.order;
           dragged.order = task.order - 0.5;
           normalizeOrder();
+          playSound('move');
           persistState();
           render();
         }
@@ -2834,6 +2909,12 @@
       document.getElementById('meta-theme-color').setAttribute('content', state.theme === 'dark' ? '#161618' : '#F5F5F7');
       document.getElementById('theme-icon-sun').classList.toggle('hidden', state.theme === 'dark');
       document.getElementById('theme-icon-moon').classList.toggle('hidden', state.theme === 'light');
+
+      // Sound-Toggle Icon
+      document.getElementById('sound-icon-on').classList.toggle('hidden', !state.soundEnabled);
+      document.getElementById('sound-icon-off').classList.toggle('hidden', state.soundEnabled);
+      const soundBtn = document.getElementById('btn-sound');
+      soundBtn.title = state.soundEnabled ? 'UI-Sounds stummschalten' : 'UI-Sounds aktivieren';
 
       // Segmented Control & View-Header
       document.querySelectorAll('.seg-btn[data-view]').forEach(b => {
@@ -3544,6 +3625,18 @@
     document.getElementById('btn-notif').addEventListener('click', e => {
       e.stopPropagation();
       togglePopover('notif-popover', renderNotifPopover);
+    });
+
+    document.getElementById('btn-sound').addEventListener('click', () => {
+      state.soundEnabled = !state.soundEnabled;
+      persistState(false);
+      render();
+      if (state.soundEnabled) {
+        playSound('subtask');
+        showToast('UI-Sounds aktiviert');
+      } else {
+        showToast('UI-Sounds stummgeschaltet');
+      }
     });
 
     document.getElementById('btn-theme').addEventListener('click', () => {
