@@ -1310,23 +1310,393 @@
     }
 
     /* =========================================================================
-       10. RESPONSIVE ANPASSUNGEN
+       9b. QUICK-ADD & BATCH-ADD BAR (SCHNELLES HINZUFÜGEN MEHRERER AUFGABEN)
+       ========================================================================= */
+    .quick-add-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 8px 10px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+    .quick-add-card:focus-within {
+      border-color: var(--q2-accent);
+      box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+
+    .qa-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .qa-input-wrap {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .qa-input {
+      width: 100%;
+      height: 34px;
+      padding: 0 8px;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-primary);
+    }
+    .qa-input:focus { box-shadow: none; }
+    .qa-input::placeholder { color: var(--text-tertiary); }
+
+    .qa-q-group {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-control);
+      padding: 2px;
+      border-radius: 8px;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .qa-q-btn {
+      height: 26px;
+      padding: 0 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all 0.14s ease;
+    }
+    .qa-q-btn:hover { color: var(--text-primary); }
+    .qa-q-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .qa-q-btn.active[data-qa-q="q1"] { color: var(--q1-accent); }
+    .qa-q-btn.active[data-qa-q="q2"] { color: var(--q2-accent); }
+    .qa-q-btn.active[data-qa-q="q3"] { color: var(--q3-accent); }
+    .qa-q-btn.active[data-qa-q="q4"] { color: var(--q4-accent); }
+
+    .qa-batch-box {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .qa-batch-textarea {
+      width: 100%;
+      min-height: 92px;
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--bg-app);
+      color: var(--text-primary);
+      font-size: 13px;
+      line-height: 1.5;
+      resize: vertical;
+    }
+    .qa-batch-textarea:focus { border-color: var(--q2-accent); box-shadow: none; }
+
+    .qa-batch-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .qa-batch-hint {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Quick-Move Button auf Aufgabenkarten (für Touch & schnelles Verschieben) */
+    .move-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-tertiary);
+      opacity: 0;
+      transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+    }
+    .task-card:hover .move-btn { opacity: 1; }
+    .move-btn:hover { background: var(--bg-control); color: var(--text-primary); }
+
+    /* Quick-Move Grid im Sheet */
+    .qm-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .qm-btn {
+      min-height: 44px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-app);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+      transition: all 0.14s ease;
+    }
+    .qm-btn:hover { border-color: var(--border-strong); }
+    .qm-btn.current {
+      border-color: var(--q2-accent);
+      background: var(--q2-tint);
+      font-weight: 600;
+    }
+
+    /* Mobile-only Elemente (Standard: ausgeblendet auf Desktop) */
+    .mobile-only { display: none !important; }
+    .mobile-scope-bar { display: none; }
+    .mobile-tabbar { display: none; }
+    .mobile-search-bar { display: none; }
+
+    /* =========================================================================
+       10. RESPONSIVE ANPASSUNGEN & NATIVE IPHONE-OPTIMIERUNG (APPLE HIG)
        ========================================================================= */
     @media (max-width: 1100px) {
       .kanban-grid { grid-template-columns: repeat(2, minmax(260px, 1fr)); }
     }
 
+    @media (hover: none) and (pointer: coarse) {
+      .move-btn, .lock-btn { opacity: 1; width: 28px; height: 28px; }
+    }
+
     @media (max-width: 768px) {
-      .app-header { padding: 0 12px; gap: 6px; }
-      .search-wrap { width: 130px; }
-      .search-wrap:focus-within { width: 170px; }
-      .search-kbd { display: none; }
-      .hide-sm { display: none; }
-      .workspace { padding: 14px 12px 32px; }
-      .kanban-grid, .matrix-grid { grid-template-columns: 1fr; }
+      .mobile-only { display: inline-flex !important; }
+      .desktop-only { display: none !important; }
+      .hide-sm { display: none !important; }
+
+      /* Kein ungewolltes Safari-Auto-Zoom bei Input-Fokus */
+      input, textarea, select { font-size: 16px !important; }
+
+      /* Safe-Area Header für iPhone Dynamic Island / Notch */
+      .app-header {
+        height: auto;
+        min-height: calc(48px + env(safe-area-inset-top));
+        padding: calc(env(safe-area-inset-top) + 6px) 14px 6px;
+        gap: 8px;
+      }
+
+      .mobile-brand {
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+      }
+
+      .icon-btn.icon-only { width: 34px; height: 34px; }
+      .icon-btn { height: 34px; }
+
+      /* Ausklappbare Mobile-Suchleiste */
+      .mobile-search-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        background: var(--bg-header);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: calc(48px + env(safe-area-inset-top));
+        z-index: 35;
+      }
+      .mobile-search-bar.hidden { display: none !important; }
+      .mobile-search-bar .search-wrap { width: 100%; }
+      .mobile-search-bar .search-input { height: 38px; border-radius: 10px; }
+
+      /* Workspace mit Platz für iOS Bottom Tab Bar */
+      .workspace {
+        padding: 12px 14px calc(86px + env(safe-area-inset-bottom));
+      }
+
+      .subbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .view-title { font-size: 20px; }
+
+      /* Horizontal scrollbare Smart-View-Chips */
+      .smart-bar {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+        margin: 0 -14px;
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+      .smart-bar::-webkit-scrollbar { display: none; }
+      .chip { flex-shrink: 0; height: 32px; padding: 0 12px; font-size: 13px; }
+
+      /* Quick-Add auf iPhone */
+      .quick-add-card { padding: 10px; border-radius: 14px; }
+      .qa-row { flex-wrap: wrap; gap: 8px; }
+      .qa-input-wrap { flex: 1 1 100%; }
+      .qa-input { height: 38px; padding: 0 4px; }
+      .qa-q-group { flex: 1; justify-content: space-between; }
+      .qa-q-btn { flex: 1; height: 32px; font-size: 12px; }
+      #qa-batch-toggle, #qa-submit-btn { height: 34px; padding: 0 12px; font-size: 13px; }
+
+      /* Mobile Spalten- / Quadranten-Switcher (vermeidet endloses Scrollen) */
+      .mobile-scope-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        margin: 0 -14px 12px;
+        padding: 2px 14px;
+      }
+      .mobile-scope-bar::-webkit-scrollbar { display: none; }
+
+      .m-scope-pill {
+        flex-shrink: 0;
+        height: 32px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .m-scope-pill.active {
+        background: var(--text-primary);
+        color: var(--bg-surface);
+        border-color: var(--text-primary);
+        font-weight: 600;
+      }
+
+      .kanban-grid, .matrix-grid { grid-template-columns: 1fr; gap: 12px; }
+      .kanban-col, .quadrant { min-height: auto; padding: 12px; }
       .matrix-axes-top { display: none; }
       .form-grid-2 { grid-template-columns: 1fr; }
-      .popover { width: calc(100vw - 24px); right: -40px; }
+
+      /* Touch-freundliche Karten-Elemente (Apple HIG 44pt Komfort) */
+      .task-card { padding: 12px 12px 11px 15px; cursor: default; }
+      .done-check { width: 22px; height: 22px; margin-top: 0; }
+      .sub-check { width: 18px; height: 18px; }
+      .subtask-row { padding: 5px 4px; font-size: 13px; }
+      .move-btn, .lock-btn { opacity: 1; width: 30px; height: 30px; }
+
+      /* Popovers auf iPhone als sauberes Bottom Sheet */
+      .popover {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100% !important;
+        max-height: 78vh;
+        overflow-y: auto;
+        border-radius: 20px 20px 0 0;
+        padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
+        z-index: 85;
+      }
+
+      /* Modals auf iPhone als native iOS Bottom Sheets */
+      .modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+      }
+      .modal-panel {
+        max-width: 100% !important;
+        border-radius: 20px 20px 0 0;
+        margin: 0;
+        padding-bottom: env(safe-area-inset-bottom);
+        position: relative;
+      }
+      .modal-panel::before {
+        content: "";
+        display: block;
+        width: 36px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--border-strong);
+        margin: 8px auto 2px;
+      }
+      .modal-body { max-height: 72vh; }
+
+      /* Toasts oberhalb der Bottom Tab Bar */
+      .toast-stack {
+        left: 14px;
+        right: 14px;
+        bottom: calc(68px + env(safe-area-inset-bottom));
+        max-width: none;
+      }
+
+      /* Native iOS Bottom Tab Bar */
+      .mobile-tabbar {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        background: var(--bg-header);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border-top: 1px solid var(--border);
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+      }
+
+      .m-tab {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        min-height: 44px;
+        color: var(--text-secondary);
+        font-size: 10px;
+        font-weight: 500;
+        border-radius: 10px;
+      }
+      .m-tab.active { color: var(--q2-accent); font-weight: 600; }
+      .m-tab.accent-tab {
+        color: var(--q2-accent);
+      }
+      .m-tab-pill {
+        width: 34px;
+        height: 26px;
+        border-radius: 999px;
+        background: var(--q2-accent);
+        color: #FFFFFF;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -1335,7 +1705,8 @@
   <!-- Kompakte 48px Apple HIG Header-Toolbar -->
   <header class="app-header">
     <div class="header-left">
-      <div class="segmented" role="tablist" aria-label="Ansicht wechseln">
+      <span class="mobile-brand mobile-only">Fokus</span>
+      <div class="segmented desktop-only" role="tablist" aria-label="Ansicht wechseln">
         <button type="button" class="seg-btn active" data-view="kanban" role="tab" aria-selected="true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="14" rx="1.5"/></svg>
           <span>Kanban</span>
@@ -1348,8 +1719,13 @@
     </div>
 
     <div class="header-right">
-      <!-- Live-Suche -->
-      <div class="search-wrap">
+      <!-- Mobile Such-Button -->
+      <button id="btn-mobile-search" class="icon-btn icon-only mobile-only" type="button" aria-label="Suche öffnen">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+
+      <!-- Live-Suche (Desktop) -->
+      <div class="search-wrap desktop-only">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="search-input" class="search-input" type="text" placeholder="Suchen..." aria-label="Aufgaben durchsuchen" />
         <span id="search-kbd" class="search-kbd">⌘F</span>
@@ -1385,7 +1761,7 @@
       </div>
 
       <!-- Cloud-Sync / Konto -->
-      <button id="btn-account" class="icon-btn" type="button" title="Cloud-Sync &amp; Konto">
+      <button id="btn-account" class="icon-btn desktop-only" type="button" title="Cloud-Sync &amp; Konto">
         <span id="sync-dot" class="sync-dot"></span>
         <span id="account-label" class="hide-sm">Lokal</span>
       </button>
@@ -1403,12 +1779,21 @@
       </button>
 
       <!-- Neue Aufgabe -->
-      <button id="btn-new-task" class="btn-primary" type="button">
+      <button id="btn-new-task" class="btn-primary desktop-only" type="button">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         <span class="hide-sm">Aufgabe</span>
       </button>
     </div>
   </header>
+
+  <!-- Ausklappbare Mobile-Suchleiste (iPhone) -->
+  <div id="mobile-search-bar" class="mobile-search-bar hidden">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="mobile-search-input" class="search-input" type="search" placeholder="Aufgaben &amp; Subtasks suchen..." aria-label="Aufgaben durchsuchen" />
+    </div>
+    <button id="btn-mobile-search-close" class="reset-link" type="button">Fertig</button>
+  </div>
 
   <!-- Hauptbereich -->
   <main class="workspace">
@@ -1445,6 +1830,45 @@
 
     <!-- Aktive Filter-Pills -->
     <div id="active-filters-row" class="active-filters-row hidden"></div>
+
+    <!-- Schnelles Hinzufügen (Einzeln per Enter oder Stapel-Modus für mehrere Aufgaben) -->
+    <section id="quick-add-bar" class="quick-add-card" aria-label="Aufgaben schnell hinzufügen">
+      <div class="qa-row">
+        <div class="qa-input-wrap">
+          <input id="qa-input" class="qa-input" type="text" maxlength="140" placeholder="Aufgabe schnell hinzufügen &amp; Enter drücken..." autocomplete="off" />
+          <span id="qa-auto-cat" class="auto-cat-pill hidden" style="flex-shrink:0; margin-left:6px;"></span>
+        </div>
+
+        <div class="qa-q-group" role="group" aria-label="Ziel-Priorität">
+          <button type="button" class="qa-q-btn" data-qa-q="q1">Q1</button>
+          <button type="button" class="qa-q-btn active" data-qa-q="q2">Q2</button>
+          <button type="button" class="qa-q-btn" data-qa-q="q3">Q3</button>
+          <button type="button" class="qa-q-btn" data-qa-q="q4">Q4</button>
+        </div>
+
+        <button id="qa-batch-toggle" class="icon-btn" type="button" title="Mehrere Aufgaben gleichzeitig eingeben">
+          <span>Mehrere</span>
+        </button>
+
+        <button id="qa-submit-btn" class="btn-primary" type="button">
+          <span>+</span>
+        </button>
+      </div>
+
+      <div id="qa-batch-box" class="qa-batch-box hidden">
+        <textarea id="qa-batch-textarea" class="qa-batch-textarea" placeholder="Eine Aufgabe pro Zeile eingeben oder einfügen...&#10;Beispiel:&#10;Skript für Medientechnik zusammenfassen&#10;Protokoll für Verein prüfen&#10;Einkaufen fürs Wochenende"></textarea>
+        <div class="qa-batch-footer">
+          <span id="qa-batch-hint" class="qa-batch-hint">Jede Zeile wird automatisch kategorisiert (⌘/Ctrl + Enter)</span>
+          <div style="display:flex; gap:6px;">
+            <button id="qa-batch-cancel" class="btn-ghost" style="height:30px; font-size:12px;" type="button">Schließen</button>
+            <button id="qa-batch-submit" class="btn-primary" type="button">Alle hinzufügen</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mobile Spalten-/Quadranten-Umschalter (nur iPhone) -->
+    <div id="mobile-scope-bar" class="mobile-scope-bar" role="tablist" aria-label="Bereich wählen"></div>
 
     <!-- Ansicht 1: Kanban-Board -->
     <section id="kanban-view" class="kanban-grid" aria-label="Kanban-Board"></section>
@@ -1620,6 +2044,56 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal: Quick-Move Sheet (Touch-freundliches Verschieben auf iPhone & Desktop) -->
+  <div id="quick-move-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="qm-title">
+    <div class="modal-panel" style="max-width:420px;">
+      <div class="modal-header">
+        <h2 id="qm-title" class="modal-title">Aufgabe verschieben</h2>
+        <button id="qm-close" class="icon-btn icon-only" type="button" aria-label="Schließen">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="qm-task-name" style="font-size:14px; font-weight:500; color:var(--text-primary);"></div>
+        <div>
+          <div class="pop-section-label">Kanban-Status</div>
+          <div id="qm-status-grid" class="qm-grid"></div>
+        </div>
+        <div>
+          <div class="pop-section-label">Eisenhower-Priorität</div>
+          <div id="qm-quadrant-grid" class="qm-grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Native iOS Bottom Tab Bar (nur iPhone <= 768px) -->
+  <nav class="mobile-tabbar" aria-label="Hauptnavigation">
+    <button type="button" class="m-tab active" data-m-view="kanban">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="14" rx="1.5"/></svg>
+      <span>Kanban</span>
+    </button>
+    <button type="button" class="m-tab" data-m-view="matrix">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.8"/><rect x="13" y="3" width="8" height="8" rx="1.8"/><rect x="3" y="13" width="8" height="8" rx="1.8"/><rect x="13" y="13" width="8" height="8" rx="1.8"/></svg>
+      <span>Matrix</span>
+    </button>
+    <button type="button" class="m-tab accent-tab" id="m-tab-add" aria-label="Neue Aufgabe">
+      <span class="m-tab-pill">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </span>
+      <span>Neu</span>
+    </button>
+    <button type="button" class="m-tab" id="m-tab-batch">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <span>Mehrere</span>
+    </button>
+    <button type="button" class="m-tab" id="m-tab-account">
+      <span style="position:relative; display:inline-flex;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="m-sync-dot" class="sync-dot" style="position:absolute; top:-2px; right:-4px;"></span>
+      </span>
+      <span>Konto</span>
+    </button>
+  </nav>
 
   <script type="module">
     /* =========================================================================
@@ -1835,7 +2309,11 @@
         deadlines: [] // 'overdue' | 'today' | 'next7' | 'none'
       },
       sortBy: 'manual',
-      dragTaskId: null
+      dragTaskId: null,
+      qaQuadrant: 'q2',
+      qaBatchOpen: false,
+      mobileKanbanScope: 'all',
+      mobileMatrixScope: 'all'
     };
 
     // Firebase Runtime
@@ -1898,6 +2376,7 @@
 
     async function saveToCloud(payload) {
       const dot = document.getElementById('sync-dot');
+      const mDot = document.getElementById('m-sync-dot');
       if (dot) dot.className = 'sync-dot syncing';
       try {
         const ref = doc(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'eisenhower', 'hig_state');
@@ -2556,7 +3035,15 @@
         : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.3-2.2"/></svg>`;
       lockBtn.addEventListener('click', e => { e.stopPropagation(); toggleQuadrantLock(task.id); });
 
-      topActions.append(lockBtn);
+      const moveBtn = document.createElement('button');
+      moveBtn.type = 'button';
+      moveBtn.className = 'move-btn';
+      moveBtn.title = 'Status oder Priorität schnell ändern';
+      moveBtn.setAttribute('aria-label', 'Verschieben');
+      moveBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>`;
+      moveBtn.addEventListener('click', e => { e.stopPropagation(); openQuickMoveModal(task.id); });
+
+      topActions.append(moveBtn, lockBtn);
       top.append(titleRow, topActions);
       card.append(top);
 
@@ -2702,7 +3189,9 @@
       container.innerHTML = '';
       const filtering = hasAnyActiveFilter();
 
+      const isMobile = window.innerWidth <= 768;
       for (const col of KANBAN_COLUMNS) {
+        if (isMobile && state.mobileKanbanScope !== 'all' && state.mobileKanbanScope !== col.id) continue;
         const allInCol = state.tasks.filter(t => t.kanbanStatus === col.id);
         const filteredWithMeta = [];
         for (const t of allInCol) {
@@ -2767,7 +3256,9 @@
       grid.innerHTML = '';
       const filtering = hasAnyActiveFilter() || state.hideDoneInMatrix;
 
+      const isMobile = window.innerWidth <= 768;
       for (const q of QUADRANTS) {
+        if (isMobile && state.mobileMatrixScope !== 'all' && state.mobileMatrixScope !== q.id) continue;
         const allInQ = state.tasks.filter(t => t.eisenhowerQuadrant === q.id);
         const filteredWithMeta = [];
         for (const t of allInQ) {
@@ -2953,6 +3444,12 @@
 
       updateNotificationBadge();
       renderActiveFilterPills();
+
+      // Mobile Tabbar & Scope-Bar synchronisieren
+      document.querySelectorAll('.m-tab[data-m-view]').forEach(t => {
+        t.classList.toggle('active', t.dataset.mView === state.view);
+      });
+      renderMobileScopeBar();
 
       // Views
       const kbView = document.getElementById('kanban-view');
@@ -3651,7 +4148,7 @@
     document.addEventListener('click', e => {
       if (!e.target.closest('.popover-anchor')) closeAllPopovers();
     });
-    ['task-modal', 'cat-modal', 'account-modal'].forEach(id => {
+    ['task-modal', 'cat-modal', 'account-modal', 'quick-move-modal'].forEach(id => {
       const m = document.getElementById(id);
       m.addEventListener('click', e => { if (e.target === m) m.classList.add('hidden'); });
     });
@@ -3669,7 +4166,7 @@
           render();
         } else {
           closeAllPopovers();
-          ['task-modal', 'cat-modal', 'account-modal'].forEach(id => {
+          ['task-modal', 'cat-modal', 'account-modal', 'quick-move-modal'].forEach(id => {
             document.getElementById(id).classList.add('hidden');
           });
         }
@@ -3696,6 +4193,7 @@
 
       if (user && !user.isAnonymous) {
         dot.className = 'sync-dot synced';
+        if (mDot) mDot.className = 'sync-dot synced';
         lbl.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Sync';
         stTxt.textContent = 'Cloud-Sync aktiv';
         emTxt.textContent = user.email || user.displayName || '';
@@ -3703,6 +4201,7 @@
         signedBox.classList.remove('hidden');
       } else {
         dot.className = 'sync-dot';
+        if (mDot) mDot.className = 'sync-dot';
         lbl.textContent = 'Lokal';
         stTxt.textContent = 'Lokaler Speicher aktiv';
         emTxt.textContent = 'Nicht mit Google verknüpft';
@@ -3765,6 +4264,264 @@
       document.getElementById('account-modal').classList.add('hidden');
       showToast('Abgemeldet — lokaler Speicher bleibt aktiv');
     });
+
+    /* =========================================================================
+       SCHNELLES HINZUFÜGEN (EINZELN & STAPEL-MODUS)
+       ========================================================================= */
+    const qaInput = document.getElementById('qa-input');
+    const qaAutoCat = document.getElementById('qa-auto-cat');
+    const qaBatchBox = document.getElementById('qa-batch-box');
+    const qaBatchTextarea = document.getElementById('qa-batch-textarea');
+    const qaBatchHint = document.getElementById('qa-batch-hint');
+    const qaBatchToggle = document.getElementById('qa-batch-toggle');
+
+    function updateQaAutoCat() {
+      const val = qaInput.value.trim();
+      if (!val) {
+        qaAutoCat.classList.add('hidden');
+        return;
+      }
+      const cat = detectCategory(val, '', []);
+      if (cat) {
+        qaAutoCat.innerHTML = `<span class="cat-dot" style="background:${cat.color};"></span><span>✦ ${esc(cat.name)}</span>`;
+        qaAutoCat.classList.remove('hidden');
+      } else {
+        qaAutoCat.classList.add('hidden');
+      }
+    }
+
+    function createQuickTaskObject(title, orderOffset = 0) {
+      const clean = title.trim().slice(0, 140);
+      const detected = detectCategory(clean, '', []);
+      return {
+        id: uid('task'),
+        title: clean,
+        description: '',
+        deadline: null,
+        updatedAt: Date.now(),
+        order: -1000 + orderOffset,
+        subtasks: [],
+        progress: 0,
+        kanbanStatus: 'pending',
+        eisenhowerQuadrant: state.qaQuadrant,
+        isQuadrantLocked: false,
+        categoryId: detected ? detected.id : null,
+        isCategoryLocked: false
+      };
+    }
+
+    function submitSingleQuickAdd() {
+      const val = qaInput.value.trim();
+      if (!val) {
+        qaInput.focus();
+        return;
+      }
+      const t = createQuickTaskObject(val, 0);
+      state.tasks.unshift(t);
+      normalizeOrder();
+      qaInput.value = '';
+      qaAutoCat.classList.add('hidden');
+      playSound('subtask');
+      persistState();
+      render();
+      qaInput.focus();
+      const cat = getCategory(t.categoryId);
+      showToast(`Hinzugefügt in ${t.eisenhowerQuadrant.toUpperCase()}${cat ? ' · ' + cat.name : ''}`, 'success');
+    }
+
+    function updateBatchHint() {
+      const lines = qaBatchTextarea.value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const btn = document.getElementById('qa-batch-submit');
+      if (lines.length === 0) {
+        qaBatchHint.textContent = 'Jede Zeile wird automatisch kategorisiert (⌘/Ctrl + Enter)';
+        btn.textContent = 'Alle hinzufügen';
+      } else {
+        qaBatchHint.textContent = `${lines.length} ${lines.length === 1 ? 'Aufgabe' : 'Aufgaben'} bereit für ${state.qaQuadrant.toUpperCase()}`;
+        btn.textContent = `${lines.length} hinzufügen`;
+      }
+    }
+
+    function submitBatchQuickAdd() {
+      const lines = qaBatchTextarea.value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (lines.length === 0) {
+        qaBatchTextarea.focus();
+        return;
+      }
+      const newTasks = lines.map((line, i) => createQuickTaskObject(line, i));
+      state.tasks = [...newTasks, ...state.tasks];
+      normalizeOrder();
+      qaBatchTextarea.value = '';
+      updateBatchHint();
+      toggleBatchMode(false);
+      playSound('done');
+      persistState();
+      render();
+      showToast(`${newTasks.length} ${newTasks.length === 1 ? 'Aufgabe' : 'Aufgaben'} in ${state.qaQuadrant.toUpperCase()} hinzugefügt`, 'success');
+    }
+
+    function toggleBatchMode(forceState = null) {
+      state.qaBatchOpen = forceState !== null ? forceState : !state.qaBatchOpen;
+      qaBatchBox.classList.toggle('hidden', !state.qaBatchOpen);
+      qaBatchToggle.classList.toggle('active', state.qaBatchOpen);
+      if (state.qaBatchOpen) {
+        qaBatchTextarea.focus();
+        updateBatchHint();
+      }
+    }
+
+    qaInput.addEventListener('input', updateQaAutoCat);
+    qaInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitSingleQuickAdd();
+      }
+    });
+    document.getElementById('qa-submit-btn').addEventListener('click', submitSingleQuickAdd);
+    qaBatchToggle.addEventListener('click', () => toggleBatchMode());
+    document.getElementById('qa-batch-cancel').addEventListener('click', () => toggleBatchMode(false));
+    document.getElementById('qa-batch-submit').addEventListener('click', submitBatchQuickAdd);
+    qaBatchTextarea.addEventListener('input', updateBatchHint);
+    qaBatchTextarea.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        submitBatchQuickAdd();
+      }
+    });
+
+    document.querySelectorAll('.qa-q-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.qaQuadrant = btn.dataset.qaQ;
+        document.querySelectorAll('.qa-q-btn').forEach(b => b.classList.toggle('active', b === btn));
+        updateBatchHint();
+      });
+    });
+
+    /* =========================================================================
+       IPHONE / MOBILE: SPALTEN-SWITCHER, SUCHE, BOTTOM TAB BAR & QUICK-MOVE
+       ========================================================================= */
+    function renderMobileScopeBar() {
+      const bar = document.getElementById('mobile-scope-bar');
+      if (!bar) return;
+      bar.innerHTML = '';
+
+      if (state.view === 'kanban') {
+        const items = [
+          { id: 'all', label: 'Alle', count: state.tasks.length, color: null },
+          ...KANBAN_COLUMNS.map(c => ({
+            id: c.id,
+            label: c.label,
+            count: state.tasks.filter(t => t.kanbanStatus === c.id).length,
+            color: c.color
+          }))
+        ];
+        for (const it of items) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = `m-scope-pill${state.mobileKanbanScope === it.id ? ' active' : ''}`;
+          b.innerHTML = `${it.color ? `<span class="chip-dot" style="background:${it.color};"></span>` : ''}<span>${it.label}</span><span class="tabular" style="opacity:0.75;">${it.count}</span>`;
+          b.addEventListener('click', () => { state.mobileKanbanScope = it.id; render(); });
+          bar.append(b);
+        }
+      } else {
+        const items = [
+          { id: 'all', label: 'Alle', count: state.tasks.length, color: null },
+          ...QUADRANTS.map(q => ({
+            id: q.id,
+            label: `${q.code} ${q.title.split(' ')[0]}`,
+            count: state.tasks.filter(t => t.eisenhowerQuadrant === q.id).length,
+            color: q.color
+          }))
+        ];
+        for (const it of items) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = `m-scope-pill${state.mobileMatrixScope === it.id ? ' active' : ''}`;
+          b.innerHTML = `${it.color ? `<span class="chip-dot" style="background:${it.color};"></span>` : ''}<span>${it.label}</span><span class="tabular" style="opacity:0.75;">${it.count}</span>`;
+          b.addEventListener('click', () => { state.mobileMatrixScope = it.id; render(); });
+          bar.append(b);
+        }
+      }
+    }
+
+    // Mobile Suche
+    const mSearchBar = document.getElementById('mobile-search-bar');
+    const mSearchInput = document.getElementById('mobile-search-input');
+    document.getElementById('btn-mobile-search').addEventListener('click', () => {
+      const opening = mSearchBar.classList.toggle('hidden');
+      if (!opening) {
+        mSearchInput.value = state.search;
+        mSearchInput.focus();
+      }
+    });
+    document.getElementById('btn-mobile-search-close').addEventListener('click', () => {
+      mSearchBar.classList.add('hidden');
+    });
+    mSearchInput.addEventListener('input', e => {
+      state.search = e.target.value;
+      document.getElementById('search-input').value = state.search;
+      render();
+    });
+
+    // Mobile Bottom Tab Bar
+    document.querySelectorAll('.m-tab[data-m-view]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.view = btn.dataset.mView;
+        persistState(false);
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+    document.getElementById('m-tab-add').addEventListener('click', () => openTaskModal());
+    document.getElementById('m-tab-batch').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      toggleBatchMode(true);
+    });
+    document.getElementById('m-tab-account').addEventListener('click', () => {
+      document.getElementById('account-modal').classList.remove('hidden');
+    });
+
+    // Quick-Move Sheet (Touch-freundliches Verschieben)
+    function openQuickMoveModal(taskId) {
+      const task = state.tasks.find(t => t.id === taskId);
+      if (!task) return;
+      document.getElementById('qm-task-name').textContent = task.title;
+
+      const stGrid = document.getElementById('qm-status-grid');
+      stGrid.innerHTML = '';
+      for (const col of KANBAN_COLUMNS) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = `qm-btn${task.kanbanStatus === col.id ? ' current' : ''}`;
+        b.innerHTML = `<span class="status-dot" style="background:${col.color};"></span><span>${col.label}</span>`;
+        b.addEventListener('click', () => {
+          moveTaskToKanbanColumn(task.id, col.id);
+          document.getElementById('quick-move-modal').classList.add('hidden');
+        });
+        stGrid.append(b);
+      }
+
+      const qGrid = document.getElementById('qm-quadrant-grid');
+      qGrid.innerHTML = '';
+      for (const q of QUADRANTS) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = `qm-btn${task.eisenhowerQuadrant === q.id ? ' current' : ''}`;
+        b.innerHTML = `<span class="q-tag" style="background:${q.color};">${q.code}</span><span>${q.title.split(' ')[0]}</span>`;
+        b.addEventListener('click', () => {
+          moveTaskToQuadrant(task.id, q.id, false);
+          document.getElementById('quick-move-modal').classList.add('hidden');
+        });
+        qGrid.append(b);
+      }
+
+      document.getElementById('quick-move-modal').classList.remove('hidden');
+    }
+
+    document.getElementById('qm-close').addEventListener('click', () => {
+      document.getElementById('quick-move-modal').classList.add('hidden');
+    });
+
+    window.addEventListener('resize', () => { render(); });
 
     /* =========================================================================
        START
