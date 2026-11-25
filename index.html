@@ -2,13 +2,13 @@
 <html lang="de" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Fokus — Kanban &amp; Eisenhower</title>
 
   <!-- Native iOS & macOS Web-App Metadaten -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Fokus" />
   <meta id="meta-theme-color" name="theme-color" content="#F5F5F7" />
 
@@ -140,16 +140,31 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --sat: env(safe-area-inset-top, 0px);
+      --sar: env(safe-area-inset-right, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+      --sal: env(safe-area-inset-left, 0px);
+    }
+
     html, body {
       font-family: var(--font-sans);
       background-color: var(--bg-app);
       color: var(--text-primary);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: 100%;
+      touch-action: manipulation;
+      overscroll-behavior-x: none;
+      width: 100%;
+      max-width: 100vw;
       min-height: 100vh;
+      min-height: 100dvh;
       font-weight: 400;
       line-height: 1.45;
       transition: background-color 0.2s ease, color 0.2s ease;
+      overflow-x: clip;
     }
 
     button, input, textarea, select {
@@ -169,16 +184,19 @@
     /* =========================================================================
        2. KOMPAKTE HEADER-TOOLBAR (48PX) & SUB-LEISTE
        ========================================================================= */
-    .app-header {
+    .top-chrome {
       position: sticky;
       top: 0;
       z-index: 40;
-      height: 48px;
       background: var(--bg-header);
-      backdrop-filter: blur(20px) saturate(160%);
-      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
       border-bottom: 1px solid var(--border);
-      padding: 0 20px;
+    }
+
+    .app-header {
+      min-height: calc(48px + var(--sat));
+      padding: var(--sat) calc(20px + var(--sar)) 0 calc(20px + var(--sal));
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -364,7 +382,7 @@
     .workspace {
       max-width: 1480px;
       margin: 0 auto;
-      padding: 18px 20px 40px;
+      padding: 18px calc(20px + var(--sar)) calc(40px + var(--sab)) calc(20px + var(--sal));
     }
 
     .subbar {
@@ -1485,48 +1503,44 @@
       .desktop-only { display: none !important; }
       .hide-sm { display: none !important; }
 
-      /* Kein ungewolltes Safari-Auto-Zoom bei Input-Fokus */
+      /* Kein ungewolltes Safari-Auto-Zoom bei Input-Fokus auf iPhone */
       input, textarea, select { font-size: 16px !important; }
 
-      /* Safe-Area Header für iPhone Dynamic Island / Notch */
+      /* Dynamic Island / Notch Safe-Area Header (iPhone 15 Pro = 59pt oben) */
       .app-header {
-        height: auto;
-        min-height: calc(48px + env(safe-area-inset-top));
-        padding: calc(env(safe-area-inset-top) + 6px) 14px 6px;
-        gap: 8px;
+        min-height: calc(50px + var(--sat));
+        padding: calc(var(--sat) + 4px) calc(14px + var(--sar)) 6px calc(14px + var(--sal));
+        gap: 6px;
       }
+
+      .header-right { gap: 6px; }
 
       .mobile-brand {
         font-size: 17px;
         font-weight: 600;
         letter-spacing: -0.02em;
         color: var(--text-primary);
+        white-space: nowrap;
       }
 
       .icon-btn.icon-only { width: 34px; height: 34px; }
-      .icon-btn { height: 34px; }
+      .icon-btn { height: 34px; padding: 0 9px; }
 
-      /* Ausklappbare Mobile-Suchleiste */
+      /* Ausklappbare Mobile-Suchleiste direkt im Sticky-Wrapper unter dem Header */
       .mobile-search-bar {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 8px 14px;
-        background: var(--bg-header);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-bottom: 1px solid var(--border);
-        position: sticky;
-        top: calc(48px + env(safe-area-inset-top));
-        z-index: 35;
+        padding: 6px calc(14px + var(--sar)) 10px calc(14px + var(--sal));
+        border-top: 1px solid var(--border);
       }
       .mobile-search-bar.hidden { display: none !important; }
       .mobile-search-bar .search-wrap { width: 100%; }
-      .mobile-search-bar .search-input { height: 38px; border-radius: 10px; }
+      .mobile-search-bar .search-input { height: 36px; border-radius: 10px; }
 
-      /* Workspace mit Platz für iOS Bottom Tab Bar */
+      /* Workspace mit sauberem Abstand zu Dynamic Island (quer) & Bottom Tab Bar */
       .workspace {
-        padding: 12px 14px calc(86px + env(safe-area-inset-bottom));
+        padding: 12px calc(14px + var(--sar)) calc(88px + var(--sab)) calc(14px + var(--sal));
       }
 
       .subbar {
@@ -1538,21 +1552,21 @@
 
       .view-title { font-size: 20px; }
 
-      /* Horizontal scrollbare Smart-View-Chips */
+      /* Horizontal scrollbare Smart-View-Chips (Edge-to-Edge auf 393pt+) */
       .smart-bar {
         flex-wrap: nowrap;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         padding-bottom: 2px;
-        margin: 0 -14px;
-        padding-left: 14px;
-        padding-right: 14px;
+        margin: 0 calc(-14px - var(--sar)) 0 calc(-14px - var(--sal));
+        padding-left: calc(14px + var(--sal));
+        padding-right: calc(14px + var(--sar));
       }
       .smart-bar::-webkit-scrollbar { display: none; }
       .chip { flex-shrink: 0; height: 32px; padding: 0 12px; font-size: 13px; }
 
-      /* Quick-Add auf iPhone */
+      /* Quick-Add optimiert für 393pt–440pt (iPhone 15 Pro bis Pro Max) */
       .quick-add-card { padding: 10px; border-radius: 14px; }
       .qa-row { flex-wrap: wrap; gap: 8px; }
       .qa-input-wrap { flex: 1 1 100%; }
@@ -1561,7 +1575,7 @@
       .qa-q-btn { flex: 1; height: 32px; font-size: 12px; }
       #qa-batch-toggle, #qa-submit-btn { height: 34px; padding: 0 12px; font-size: 13px; }
 
-      /* Mobile Spalten- / Quadranten-Switcher (vermeidet endloses Scrollen) */
+      /* Mobile Spalten- / Quadranten-Switcher */
       .mobile-scope-bar {
         display: flex;
         align-items: center;
@@ -1569,8 +1583,8 @@
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
-        margin: 0 -14px 12px;
-        padding: 2px 14px;
+        margin: 0 calc(-14px - var(--sar)) 12px calc(-14px - var(--sal));
+        padding: 2px calc(14px + var(--sar)) 2px calc(14px + var(--sal));
       }
       .mobile-scope-bar::-webkit-scrollbar { display: none; }
 
@@ -1600,14 +1614,14 @@
       .matrix-axes-top { display: none; }
       .form-grid-2 { grid-template-columns: 1fr; }
 
-      /* Touch-freundliche Karten-Elemente (Apple HIG 44pt Komfort) */
+      /* Touch-freundliche Karten-Elemente */
       .task-card { padding: 12px 12px 11px 15px; cursor: default; }
       .done-check { width: 22px; height: 22px; margin-top: 0; }
       .sub-check { width: 18px; height: 18px; }
       .subtask-row { padding: 5px 4px; font-size: 13px; }
       .move-btn, .lock-btn { opacity: 1; width: 30px; height: 30px; }
 
-      /* Popovers auf iPhone als sauberes Bottom Sheet */
+      /* Popovers als iOS Bottom Sheet (nie hinter Dynamic Island) */
       .popover {
         position: fixed;
         top: auto;
@@ -1615,24 +1629,27 @@
         left: 0;
         right: 0;
         width: 100% !important;
-        max-height: 78vh;
+        max-height: calc(100dvh - var(--sat) - 16px);
         overflow-y: auto;
         border-radius: 20px 20px 0 0;
-        padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+        padding: 16px calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal));
         box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
         z-index: 85;
       }
 
-      /* Modals auf iPhone als native iOS Bottom Sheets */
+      /* Modals als native iOS Bottom Sheets */
       .modal-backdrop {
         align-items: flex-end;
-        padding: 0;
+        padding: calc(var(--sat) + 12px) 0 0;
       }
       .modal-panel {
         max-width: 100% !important;
+        max-height: calc(100dvh - var(--sat) - 12px);
+        display: flex;
+        flex-direction: column;
         border-radius: 20px 20px 0 0;
         margin: 0;
-        padding-bottom: env(safe-area-inset-bottom);
+        padding: 0 var(--sar) var(--sab) var(--sal);
         position: relative;
       }
       .modal-panel::before {
@@ -1643,18 +1660,19 @@
         border-radius: 999px;
         background: var(--border-strong);
         margin: 8px auto 2px;
+        flex-shrink: 0;
       }
-      .modal-body { max-height: 72vh; }
+      .modal-body { max-height: calc(100dvh - var(--sat) - 150px); }
 
-      /* Toasts oberhalb der Bottom Tab Bar */
+      /* Toasts oberhalb der Bottom Tab Bar & innerhalb Safe-Area */
       .toast-stack {
-        left: 14px;
-        right: 14px;
-        bottom: calc(68px + env(safe-area-inset-bottom));
+        left: calc(14px + var(--sal));
+        right: calc(14px + var(--sar));
+        bottom: calc(68px + var(--sab));
         max-width: none;
       }
 
-      /* Native iOS Bottom Tab Bar */
+      /* Native iOS Bottom Tab Bar mit Home-Indicator Safe-Area */
       .mobile-tabbar {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
@@ -1667,7 +1685,7 @@
         backdrop-filter: blur(24px) saturate(180%);
         -webkit-backdrop-filter: blur(24px) saturate(180%);
         border-top: 1px solid var(--border);
-        padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+        padding: 6px calc(6px + var(--sar)) calc(6px + var(--sab)) calc(6px + var(--sal));
       }
 
       .m-tab {
@@ -1684,9 +1702,7 @@
         border-radius: 10px;
       }
       .m-tab.active { color: var(--q2-accent); font-weight: 600; }
-      .m-tab.accent-tab {
-        color: var(--q2-accent);
-      }
+      .m-tab.accent-tab { color: var(--q2-accent); }
       .m-tab-pill {
         width: 34px;
         height: 26px;
@@ -1698,11 +1714,37 @@
         justify-content: center;
       }
     }
+
+    /* Extra Feinschliff für iPhone 15 Pro im Querformat (Dynamic Island links/rechts) */
+    @media (max-height: 500px) and (pointer: coarse) {
+      .app-header {
+        min-height: 44px;
+        padding: 4px calc(16px + var(--sar)) 4px calc(16px + var(--sal));
+      }
+      .workspace {
+        padding-left: calc(16px + var(--sal));
+        padding-right: calc(16px + var(--sar));
+      }
+      .modal-panel {
+        max-height: calc(100dvh - 12px);
+      }
+      .modal-body {
+        max-height: calc(100dvh - 120px);
+      }
+    }
+
+    /* Standalone Home-Screen PWA-Modus: garantierter Sicherheitsabstand unter der Dynamic Island */
+    @media (display-mode: standalone) and (max-width: 768px) {
+      .app-header {
+        padding-top: calc(max(var(--sat), 47px) + 4px);
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Kompakte 48px Apple HIG Header-Toolbar -->
+  <!-- Sticky Top-Chrome (Dynamic Island / Notch Safe-Area) -->
+  <div class="top-chrome">
   <header class="app-header">
     <div class="header-left">
       <span class="mobile-brand mobile-only">Fokus</span>
@@ -1793,6 +1835,7 @@
       <input id="mobile-search-input" class="search-input" type="search" placeholder="Aufgaben &amp; Subtasks suchen..." aria-label="Aufgaben durchsuchen" />
     </div>
     <button id="btn-mobile-search-close" class="reset-link" type="button">Fertig</button>
+  </div>
   </div>
 
   <!-- Hauptbereich -->
@@ -2378,6 +2421,7 @@
       const dot = document.getElementById('sync-dot');
       const mDot = document.getElementById('m-sync-dot');
       if (dot) dot.className = 'sync-dot syncing';
+      if (mDot) mDot.className = 'sync-dot syncing';
       try {
         const ref = doc(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'eisenhower', 'hig_state');
         await setDoc(ref, {
@@ -2388,9 +2432,11 @@
           updatedAt: payload.updatedAt
         }, { merge: true });
         if (dot) dot.className = 'sync-dot synced';
+        if (mDot) mDot.className = 'sync-dot synced';
       } catch (err) {
         console.warn('Cloud-Sync Fehler:', err);
         if (dot) dot.className = 'sync-dot';
+        if (mDot) mDot.className = 'sync-dot';
       }
     }
 
@@ -4185,6 +4231,7 @@
 
     function updateAccountModalUI(user) {
       const dot = document.getElementById('sync-dot');
+      const mDot = document.getElementById('m-sync-dot');
       const lbl = document.getElementById('account-label');
       const stTxt = document.getElementById('acc-status-text');
       const emTxt = document.getElementById('acc-email-text');
@@ -4522,6 +4569,10 @@
     });
 
     window.addEventListener('resize', () => { render(); });
+
+    // iOS Safari Pinch-to-Zoom blockieren (wie bei einer nativen iOS-App)
+    document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+    document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
 
     /* =========================================================================
        START
