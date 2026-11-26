@@ -156,7 +156,6 @@
       -webkit-tap-highlight-color: transparent;
       -webkit-text-size-adjust: 100%;
       touch-action: manipulation;
-      overscroll-behavior-x: none;
       width: 100%;
       max-width: 100vw;
       min-height: 100vh;
@@ -188,10 +187,17 @@
       position: sticky;
       top: 0;
       z-index: 40;
+      border-bottom: 1px solid var(--border);
+    }
+    .top-chrome::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
       background: var(--bg-header);
       backdrop-filter: blur(22px) saturate(180%);
       -webkit-backdrop-filter: blur(22px) saturate(180%);
-      border-bottom: 1px solid var(--border);
     }
 
     .app-header {
@@ -1000,22 +1006,34 @@
        ========================================================================= */
     .popover-anchor { position: relative; }
 
+    .popover-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 88;
+      background: var(--backdrop);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
     .popover {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
+      position: fixed;
+      top: 56px;
+      right: 20px;
       width: 310px;
+      max-height: calc(100dvh - 80px);
+      overflow-y: auto;
       background: var(--bg-surface);
       border-radius: 14px;
       box-shadow: var(--shadow-popover);
       padding: 14px;
-      z-index: 60;
+      z-index: 90;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
     .popover.wide { width: 350px; }
+    #sort-popover { width: 240px; }
 
     .popover-header {
       display: flex;
@@ -1658,16 +1676,21 @@
 
       .view-title { font-size: 20px; }
 
-      /* Horizontal scrollbare Smart-View-Chips (Edge-to-Edge auf 393pt+) */
+      /* Horizontal scrollbare Smart-View-Chips (vollständig bis rechts wischbar) */
+      .subbar { min-width: 0; width: 100%; }
       .smart-bar {
+        display: flex;
         flex-wrap: nowrap;
-        overflow-x: auto;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: scroll;
+        overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
+        touch-action: pan-x pan-y;
         scrollbar-width: none;
-        padding-bottom: 2px;
-        margin: 0 calc(-14px - var(--sar)) 0 calc(-14px - var(--sal));
-        padding-left: calc(14px + var(--sal));
-        padding-right: calc(14px + var(--sar));
+        padding: 2px 24px 4px 2px;
+        margin: 0;
       }
       .smart-bar::-webkit-scrollbar { display: none; }
       .chip { flex-shrink: 0; height: 32px; padding: 0 12px; font-size: 13px; }
@@ -1681,16 +1704,21 @@
       .qa-q-btn { flex: 1; height: 32px; font-size: 12px; }
       #qa-batch-toggle, #qa-submit-btn { height: 34px; padding: 0 12px; font-size: 13px; }
 
-      /* Mobile Spalten- / Quadranten-Switcher */
+      /* Mobile Spalten- / Quadranten-Switcher (vollständig bis rechts wischbar) */
       .mobile-scope-bar {
         display: flex;
         align-items: center;
         gap: 6px;
-        overflow-x: auto;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: scroll;
+        overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
+        touch-action: pan-x pan-y;
         scrollbar-width: none;
-        margin: 0 calc(-14px - var(--sar)) 12px calc(-14px - var(--sal));
-        padding: 2px calc(14px + var(--sar)) 2px calc(14px + var(--sal));
+        margin: 0 0 12px 0;
+        padding: 2px 24px 4px 2px;
       }
       .mobile-scope-bar::-webkit-scrollbar { display: none; }
 
@@ -1727,20 +1755,33 @@
       .subtask-row { padding: 5px 4px; font-size: 13px; }
       .move-btn, .lock-btn { opacity: 1; width: 30px; height: 30px; }
 
-      /* Popovers als iOS Bottom Sheet (nie hinter Dynamic Island) */
-      .popover {
-        position: fixed;
-        top: auto;
-        bottom: 0;
-        left: 0;
-        right: 0;
+      /* Popovers als iOS Bottom Sheet (direkt in <body>, immer sauber unten!) */
+      .popover,
+      #sort-popover,
+      .popover.wide {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
         width: 100% !important;
-        max-height: calc(100dvh - var(--sat) - 16px);
+        max-height: calc(100dvh - var(--sat) - 32px);
         overflow-y: auto;
+        overscroll-behavior: contain;
         border-radius: 20px 20px 0 0;
-        padding: 16px calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal));
-        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
-        z-index: 85;
+        padding: 10px calc(16px + var(--sar)) calc(22px + var(--sab)) calc(16px + var(--sal));
+        box-shadow: 0 -12px 44px rgba(0, 0, 0, 0.42);
+        z-index: 90;
+      }
+      .popover::before {
+        content: "";
+        display: block;
+        width: 36px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--border-strong);
+        margin: 0 auto 6px;
+        flex-shrink: 0;
       }
 
       /* Modals als native iOS Bottom Sheets */
@@ -1887,7 +1928,6 @@
           <span class="hide-sm">Filter</span>
           <span id="filter-badge" class="badge-count neutral hidden">0</span>
         </button>
-        <div id="filter-popover" class="popover hidden" role="dialog" aria-label="Filter"></div>
       </div>
 
       <!-- Sortier-Menü -->
@@ -1896,7 +1936,6 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
           <span class="hide-sm">Sortieren</span>
         </button>
-        <div id="sort-popover" class="popover hidden" style="width: 240px;" role="menu" aria-label="Sortieren"></div>
       </div>
 
       <!-- Benachrichtigungs-Glocke -->
@@ -1905,7 +1944,6 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           <span id="notif-badge" class="badge-count hidden" style="position:absolute; top:-5px; right:-5px;">0</span>
         </button>
-        <div id="notif-popover" class="popover wide hidden" role="dialog" aria-label="Benachrichtigungen"></div>
       </div>
 
       <!-- Cloud-Sync / Konto -->
@@ -2037,6 +2075,12 @@
       <div id="matrix-grid" class="matrix-grid"></div>
     </section>
   </main>
+
+  <!-- Popover-Backdrop (Mobile) & Popovers als direkte Kinder von <body> (iOS-Safari-sicher) -->
+  <div id="popover-backdrop" class="popover-backdrop hidden"></div>
+  <div id="filter-popover" class="popover hidden" role="dialog" aria-label="Filter"></div>
+  <div id="sort-popover" class="popover hidden" role="menu" aria-label="Sortieren"></div>
+  <div id="notif-popover" class="popover wide hidden" role="dialog" aria-label="Benachrichtigungen"></div>
 
   <!-- Toast-Container -->
   <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
@@ -4070,14 +4114,30 @@
       ['filter-popover', 'sort-popover', 'notif-popover'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
       });
+      const bd = document.getElementById('popover-backdrop');
+      if (bd) bd.classList.add('hidden');
     }
 
-    function togglePopover(popoverId, renderFn) {
+    function togglePopover(popoverId, renderFn, triggerEl = null) {
       const el = document.getElementById(popoverId);
       const willOpen = el.classList.contains('hidden');
       closeAllPopovers();
       if (willOpen) {
         renderFn();
+        if (window.innerWidth > 768 && triggerEl) {
+          const rect = triggerEl.getBoundingClientRect();
+          el.style.top = `${Math.round(rect.bottom + 8)}px`;
+          el.style.right = `${Math.max(12, Math.round(window.innerWidth - rect.right))}px`;
+          el.style.left = 'auto';
+          el.style.bottom = 'auto';
+        } else {
+          el.style.top = '';
+          el.style.right = '';
+          el.style.left = '';
+          el.style.bottom = '';
+          const bd = document.getElementById('popover-backdrop');
+          if (bd) bd.classList.remove('hidden');
+        }
         el.classList.remove('hidden');
       }
     }
@@ -4753,15 +4813,15 @@
 
     document.getElementById('btn-filter').addEventListener('click', e => {
       e.stopPropagation();
-      togglePopover('filter-popover', renderFilterPopover);
+      togglePopover('filter-popover', renderFilterPopover, e.currentTarget);
     });
     document.getElementById('btn-sort').addEventListener('click', e => {
       e.stopPropagation();
-      togglePopover('sort-popover', renderSortPopover);
+      togglePopover('sort-popover', renderSortPopover, e.currentTarget);
     });
     document.getElementById('btn-notif').addEventListener('click', e => {
       e.stopPropagation();
-      togglePopover('notif-popover', renderNotifPopover);
+      togglePopover('notif-popover', renderNotifPopover, e.currentTarget);
     });
 
     document.getElementById('btn-sound').addEventListener('click', () => {
@@ -4785,8 +4845,9 @@
     document.getElementById('btn-new-task').addEventListener('click', () => openTaskModal());
 
     // Klick außerhalb schließt Popovers & Modals
+    document.getElementById('popover-backdrop').addEventListener('click', closeAllPopovers);
     document.addEventListener('click', e => {
-      if (!e.target.closest('.popover-anchor')) closeAllPopovers();
+      if (!e.target.closest('.popover-anchor') && !e.target.closest('.popover')) closeAllPopovers();
     });
     ['task-modal', 'cat-modal', 'account-modal', 'quick-move-modal', 'recurring-modal'].forEach(id => {
       const m = document.getElementById(id);
